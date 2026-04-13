@@ -1,0 +1,2 @@
+<%= turbo_stream.replace dom_id(@blog), partial: "blogs/blog", locals: { blog: @blog } %>
+<%= turbo_stream.update "modal", "" %>

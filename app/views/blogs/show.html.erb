@@ -1,0 +1,53 @@
+<turbo-frame id="modal">
+
+  <!-- HEADER (DARK + SEPARATED) -->
+  <div class="bg-gray-900 text-white px-5 py-4 rounded-t-xl flex justify-between items-center shadow-sm">
+
+    <h2 class="text-lg font-semibold tracking-wide text-gray-300 uppercase">
+      View Blog
+    </h2>
+
+    <button
+      type="button"
+      data-action="click->modal#close"
+      class="text-gray-400 hover:text-red-400 text-xl font-bold transition">
+      &times;
+    </button>
+  </div>
+
+  <!-- BODY WRAPPER -->
+  <div class="bg-white px-6 py-5">
+
+    <div class="space-y-5">
+
+      <!-- TITLE -->
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 leading-snug">
+          <%= @blog.title %>
+        </h1>
+
+        <!-- META BADGE -->
+        <div class="mt-2">
+          <span class="inline-block bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">
+          <%= time_ago_in_words(@blog.created_at) %> ago
+          </span>
+        </div>
+      </div>
+
+      <!-- SUBTLE DIVIDER -->
+      <div class="border-t border-gray-100"></div>
+
+      <!-- BODY (CARD STYLE) -->
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
+
+        <p class="text-gray-700 leading-relaxed text-[15px] whitespace-pre-line">
+          <%= @blog.body %>
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</turbo-frame>

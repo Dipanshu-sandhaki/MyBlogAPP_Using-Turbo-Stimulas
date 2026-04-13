@@ -1,0 +1,25 @@
+<div class="min-h-screen bg-gray-100">
+
+  <div class="max-w-2xl mx-auto mt-10">
+
+  <!-- HEADER ROW -->
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-4xl font-semibold">My Blogs</h1>
+
+    <%= link_to new_blog_path,
+    data: {
+      turbo_frame: "modal"
+    },
+    class: "flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition" do %>
+
+  <span class="text-lg">+</span>
+  <span>Create Blog</span>
+<% end %>
+  </div>
+
+  <div id="blogs" class="space-y-5">
+  <%= render @blogs %>
+</div>
+
+
+</div>
