@@ -33,7 +33,7 @@ handleFrameLoad(event) {
   open() {
     this.modalTarget.classList.remove("hidden")
 
-    // scroll lock (important UX 🔥)
+    // scroll lock
     document.body.classList.add("overflow-hidden")
   }
 

@@ -1,0 +1,37 @@
+<turbo-frame id="modal">
+
+  <!-- HEADER -->
+  <div class="bg-gray-900 text-white px-5 py-4 flex justify-between items-center">
+    <h2 class="text-lg font-semibold uppercase text-gray-300">
+      Bulk Upload Blogs
+    </h2>
+
+    <button
+      type="button"
+      data-action="click->modal#close"
+      class="text-gray-400 hover:text-red-400 text-xl font-bold">
+      &times;
+    </button>
+  </div>
+
+  <!-- BODY -->
+  <div class="bg-white p-6 space-y-4">
+
+    <%= form_with url: bulk_create_blogs_path,
+              method: :post,
+              html: { multipart: true },
+              data: { turbo: false } do |f| %>
+
+  <input type="file" name="file" accept=".csv"
+         class="w-full border border-gray-300 rounded-lg p-2 mb-4">
+
+  <button type="submit"
+          class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+    Upload
+  </button>
+
+<% end %>
+
+  </div>
+
+</turbo-frame>

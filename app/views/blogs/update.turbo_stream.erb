@@ -1,2 +1,19 @@
-<%= turbo_stream.replace dom_id(@blog), partial: "blogs/blog", locals: { blog: @blog } %>
-<%= turbo_stream.update "modal", "" %>
+<% if @blog.errors.any? %>
+  <%= turbo_stream.replace "modal" do %>
+    <turbo-frame id="modal">
+      <%= render "blogs/form", blog: @blog %>
+    </turbo-frame>
+  <% end %>
+<% else %>
+  <%= turbo_stream.replace dom_id(@blog) do %>
+    <%= render @blog %>
+  <% end %>
+
+  <%= turbo_stream.replace "modal" do %>
+    <turbo-frame id="modal"></turbo-frame>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.replace "flash" do %>
+  <%= render "shared/flash" %>
+<% end %>

@@ -1,7 +1,7 @@
 <turbo-frame id="modal">
 
-  <!-- HEADER (DARK + SEPARATED) -->
-  <div class="bg-gray-900 text-white px-5 py-4 rounded-t-xl flex justify-between items-center shadow-sm">
+  <!-- HEADER -->
+  <div class="bg-gray-900 text-white px-5 py-4 rounded-t-xl flex justify-between items-center">
 
     <h2 class="text-lg font-semibold tracking-wide text-gray-300 uppercase">
       View Blog
@@ -15,36 +15,33 @@
     </button>
   </div>
 
-  <!-- BODY WRAPPER -->
-  <div class="bg-white px-6 py-5">
+  <!-- BODY -->
+  <div class="bg-white px-6 py-4">
 
-    <div class="space-y-5">
+    <!-- TITLE -->
+    <div class="mb-2">
+      <h1 class="text-2xl font-bold text-gray-900 leading-snug">
+        <%= @blog.title %>
+      </h1>
 
-      <!-- TITLE -->
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 leading-snug">
-          <%= @blog.title %>
-        </h1>
-
-        <!-- META BADGE -->
-        <div class="mt-2">
-          <span class="inline-block bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">
+      <div class="mt-1">
+        <span class="inline-block bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">
           <%= time_ago_in_words(@blog.created_at) %> ago
-          </span>
-        </div>
+        </span>
       </div>
+    </div>
 
-      <!-- SUBTLE DIVIDER -->
-      <div class="border-t border-gray-100"></div>
+    <!-- DIVIDER -->
+    <div class="border-t border-gray-200 mb-3"></div>
 
-      <!-- BODY (CARD STYLE) -->
-      <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
+    <!-- CONTENT BOX -->
+    <div class="bg-white border border-gray-500 rounded-xl px-4 py-3 shadow-sm">
 
-        <p class="text-gray-700 leading-relaxed text-[15px] whitespace-pre-line">
-          <%= @blog.body %>
-        </p>
+  <div class="text-gray-800 text-[15px] leading-normal break-all text-justify">
+  <%= simple_format(@blog.body.strip) %>
+</div>
 
-      </div>
+</div>
 
     </div>
 
