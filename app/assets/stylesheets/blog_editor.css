@@ -1,0 +1,294 @@
+.be-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.be-optional {
+  font-size: 11px;
+  font-weight: 400;
+  color: #4b5563;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.be-input {
+  width: 100%;
+  background: #111827;
+  border: 1px solid #374151;
+  color: #f9fafb;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 15px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
+.be-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.be-card {
+  background: #111827;
+  border: 1px solid #374151;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.be-file-btn {
+  flex-shrink: 0;
+  background: #1f2937;
+  border: 1px solid #4b5563;
+  color: #d1d5db;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.cover-preview {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 12px;
+  display: none;
+  border: 1px solid #374151;
+}
+
+.be-toolbar {
+  background: #0f1523;
+  border: 1px solid #1e2d4a;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  padding: 8px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ── Button group with divider ── */
+.be-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding-right: 8px;
+  margin-right: 4px;
+  border-right: 1px solid #1e2d4a;
+}
+
+.be-group:last-child {
+  border-right: none;
+  padding-right: 0;
+  margin-right: 0;
+}
+
+/* ── Individual toolbar button ── */
+.be-btn {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #9ca3af;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.12s, color 0.12s;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.be-btn svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.be-btn:hover {
+  background: #1e2d4a;
+  color: #e5e7eb;
+}
+
+.be-btn.trix-active,
+.be-btn[data-trix-active] {
+  background: #4f46e5;
+  color: #fff;
+}
+
+/* Text-label buttons */
+.be-btn--text {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  width: auto;
+  min-width: 30px;
+  padding: 0 6px;
+  letter-spacing: 0;
+}
+
+/* Color button */
+.be-btn--color {
+  width: 32px;
+  overflow: visible;
+}
+
+.be-color-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* LINK DIALOG */
+
+.be-link-dialog {
+  /* display toggled by Stimulus controller */
+  background: #0f1523;
+  border: 1px solid #1e2d4a;
+  border-top: 1px solid #4f46e5;
+  padding: 10px 14px;
+}
+
+.be-link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.be-link-icon {
+  width: 16px;
+  height: 16px;
+  stroke: #6366f1;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.be-link-input {
+  flex: 1;
+  background: #111827;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  color: #f9fafb;
+  font-size: 13px;
+  padding: 7px 12px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.be-link-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.be-link-btn {
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background 0.12s;
+  flex-shrink: 0;
+}
+
+.be-link-btn--apply {
+  background: #4f46e5;
+  color: #fff;
+}
+.be-link-btn--apply:hover { background: #6366f1; }
+
+.be-link-btn--remove {
+  background: #1f2937;
+  color: #f87171;
+  border: 1px solid #374151;
+}
+.be-link-btn--remove:hover { background: #7f1d1d; color: #fca5a5; border-color: #7f1d1d; }
+
+/* TRIX EDITOR BODY */
+
+trix-editor {
+  background: #090e1a !important;
+  border: 1px solid #1e2d4a !important;
+  border-top: none !important;
+  border-radius: 0 0 12px 12px !important;
+  color: #e2e8f0 !important;
+  font-size: 15px !important;
+  line-height: 1.85 !important;
+  padding: 22px 28px !important;
+  min-height: 380px !important;
+  outline: none !important;
+  caret-color: #818cf8 !important;
+  font-family: Georgia, 'Times New Roman', serif !important;
+}
+
+trix-editor:focus {
+  border-color: #4f46e5 !important;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+}
+
+trix-editor h1 {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  border-bottom: 1px solid #1e2d4a !important;
+  padding-bottom: 8px !important;
+  margin: 20px 0 10px !important;
+}
+
+trix-editor blockquote {
+  border-left: 3px solid #6366f1 !important;
+  padding-left: 18px !important;
+  color: #94a3b8 !important;
+  font-style: italic !important;
+  margin: 14px 0 !important;
+}
+
+trix-editor pre {
+  background: #060a14 !important;
+  border: 1px solid #1e2d4a !important;
+  border-radius: 8px !important;
+  padding: 14px 18px !important;
+  font-family: 'Fira Code', 'Courier New', monospace !important;
+  font-size: 13px !important;
+  color: #a5f3fc !important;
+  overflow-x: auto !important;
+}
+
+trix-editor ul     { list-style: disc    !important; padding-left: 24px !important; }
+trix-editor ol     { list-style: decimal !important; padding-left: 24px !important; }
+trix-editor li     { margin: 5px 0 !important; }
+trix-editor a      { color: #818cf8 !important; text-decoration: underline !important; }
+trix-editor strong { color: #f8fafc !important; }
+
+/* SLIDE-UP ANIMATION */
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.form-field                { animation: slideUp 0.3s ease both; }
+.form-field:nth-child(1)   { animation-delay: 0.05s; }
+.form-field:nth-child(2)   { animation-delay: 0.12s; }
+.form-field:nth-child(3)   { animation-delay: 0.20s; }
+.form-field:nth-child(4)   { animation-delay: 0.28s; }

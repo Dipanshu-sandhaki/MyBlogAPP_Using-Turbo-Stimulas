@@ -1,0 +1,9 @@
+<!-- COMMENT FORM -->
+<div id="comment_form_<%= blog.id %>">
+  <%= render "comments/form", blog: blog, comment: Comment.new %>
+</div>
+
+<!-- COMMENT LIST -->
+<div id="comment_list_<%= blog.id %>" class="mt-3 space-y-2">
+  <%= render blog.comments.order(created_at: :desc), blog: blog, current_user: current_user %>
+</div>

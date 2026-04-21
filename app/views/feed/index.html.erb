@@ -1,0 +1,92 @@
+<div class="page-wrapper min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="max-w-5xl mx-auto px-4 py-8 flex gap-8">
+
+    <!-- LEFT: MAIN FEED -->
+    <div class="flex-1 min-w-0">
+      <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Your Feed</h1>
+
+      <% if @blogs.empty? %>
+        <div class="bg-white dark:bg-gray-900 rounded-2xl p-12 text-center border border-gray-200 dark:border-gray-800 shadow-sm">
+          <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-400" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l6 6v10a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+          <p class="text-gray-700 dark:text-gray-200 font-semibold text-lg">No posts yet</p>
+          <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">
+            Follow people from the right panel to see their blogs here.
+          </p>
+        </div>
+      <% else %>
+        <div class="space-y-5">
+          <% @blogs.each do |blog| %>
+            <%= render partial: "blogs/feed_blog", locals: { blog: blog, current_user: current_user } %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- RIGHT: DISCOVER PEOPLE -->
+    <div class="w-72 shrink-0">
+      <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm sticky top-20">
+
+        <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+          <h2 class="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wide">
+            Discover People
+          </h2>
+          <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">People you might want to follow</p>
+        </div>
+
+        <div class="p-4">
+          <% if @all_users.empty? %>
+            <div class="text-center py-6">
+              <p class="text-sm text-gray-400 dark:text-gray-500">No other users yet!</p>
+            </div>
+          <% else %>
+            <div class="space-y-4">
+              <% @all_users.each do |user| %>
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <div class="w-9 h-9 rounded-full overflow-hidden bg-blue-600
+                                flex items-center justify-center shrink-0 border border-gray-100 dark:border-gray-700">
+                      <% if user.avatar.attached? %>
+                        <%= image_tag url_for(user.avatar), class: "w-full h-full object-cover" %>
+                      <% else %>
+                        <span class="text-white text-xs font-bold"><%= user.email[0].upcase %></span>
+                      <% end %>
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">
+                        <%= user.email.split("@").first %>
+                      </p>
+                      <p class="text-xs text-gray-400 dark:text-gray-500"><%= user.blogs.count %> posts</p>
+                    </div>
+                  </div>
+
+                  <% if current_user.following?(user) %>
+                    <%= button_to unfollow_user_path(user),
+                        method: :delete,
+                        class: "text-xs border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300
+                                px-3 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition whitespace-nowrap font-medium" do %>
+                      ✓ Following
+                    <% end %>
+                  <% else %>
+                    <%= button_to follow_user_path(user),
+                        method: :post,
+                        class: "text-xs bg-blue-600 text-white px-3 py-1
+                                rounded-full hover:bg-blue-700 transition whitespace-nowrap font-medium" do %>
+                      + Follow
+                    <% end %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -19,45 +19,27 @@ class BlogsController < ApplicationController
     @blog = current_user.blogs.find(params[:id])
   end
 
-  def create
-    @blog = current_user.blogs.build(blog_params)
+def create
+  @blog = current_user.blogs.build(blog_params)
 
-    if @blog.save
-      flash.now[:notice] = "Blog created successfully"
-    else
-      flash.now[:alert] = @blog.errors.full_messages.to_sentence
-    end
-
-    respond_to do |format|
-      format.turbo_stream
-      format.html do
-        if @blog.persisted?
-          redirect_to blogs_path, notice: "Blog created successfully"
-        else
-          render :new, status: :unprocessable_entity
-        end
+  respond_to do |format|
+    format.html do
+      if @blog.save
+        redirect_to my_blogs_path, notice: "Blog created successfully"
+      else
+        render :new, status: :unprocessable_entity
       end
     end
   end
+end
 
-  def update
-    if @blog.update(blog_params)
-      flash.now[:notice] = "Blog updated successfully"
-    else
-      flash.now[:alert] = @blog.errors.full_messages.to_sentence
-    end
-
-    respond_to do |format|
-      format.turbo_stream
-      format.html do
-        if @blog.errors.empty?
-          redirect_to blogs_path, notice: "Blog updated successfully."
-        else
-          render :edit, status: :unprocessable_entity
-        end
-      end
-    end
+def update
+  if @blog.update(blog_params)
+    redirect_to my_blogs_path, notice: "Blog updated successfully"
+  else
+    render :edit, status: :unprocessable_entity
   end
+end
 
   def bulk_upload
     render partial: "blogs/bulk_upload"
@@ -94,10 +76,9 @@ class BlogsController < ApplicationController
           next
         end
 
-        current_user.blogs.create!(
-          title: title,
-          body: body
-        )
+        blog = current_user.blogs.create!(title: title)
+        blog.content = body
+        blog.save
 
         created_count += 1
       end
@@ -120,10 +101,17 @@ def bulk_delete
 
     flash.now[:notice] = "Blogs deleted successfully"
 
-    render turbo_stream: [
-      *ids.map { |id| turbo_stream.remove("blog_#{id}") },
-      turbo_stream.replace("flash", partial: "shared/flash")
-    ]
+   render turbo_stream: [
+  *ids.map { |id| turbo_stream.remove("blog_#{id}") },
+
+  turbo_stream.replace(
+    "action_bar",
+    partial: "blogs/action_bar",
+    locals: { blogs: current_user.blogs }
+  ),
+
+  turbo_stream.replace("flash", partial: "shared/flash")
+]
   else
     flash.now[:alert] = "No blogs selected"
 
@@ -152,6 +140,6 @@ end
   end
 
   def blog_params
-    params.require(:blog).permit(:title, :body)
-  end
+  params.require(:blog).permit(:title, :content, :cover_image)
+end
 end

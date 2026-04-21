@@ -1,17 +1,13 @@
-<% if @blog.errors.any? %>
-  <%= turbo_stream.replace "modal" do %>
-    <turbo-frame id="modal">
-      <%= render "blogs/form", blog: @blog %>
-    </turbo-frame>
-  <% end %>
-<% else %>
-  <%= turbo_stream.prepend "blogs" do %>
-    <%= render @blog %>
-  <% end %>
+<%= turbo_stream.prepend "blogs" do %>
+  <%= render @blog %>
+<% end %>
 
-  <%= turbo_stream.replace "modal" do %>
-    <turbo-frame id="modal"></turbo-frame>
-  <% end %>
+<%= turbo_stream.replace "action_bar" do %>
+  <%= render "blogs/action_bar", blogs: current_user.blogs.order(created_at: :desc) %>
+<% end %>
+
+<%= turbo_stream.replace "modal" do %>
+  <turbo-frame id="modal"></turbo-frame>
 <% end %>
 
 <%= turbo_stream.replace "flash" do %>

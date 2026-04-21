@@ -1,42 +1,112 @@
-<h2>Edit <%= resource_name.to_s.humanize %></h2>
+<div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-10">
+  <div class="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-sm
+              border border-gray-200 dark:border-gray-700 p-8">
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">
+      Edit Profile
+    </h2>
 
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
-  </div>
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name),
+        html: { method: :put, multipart: true, class: "space-y-5" }) do |f| %>
 
-  <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-    <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
-  <% end %>
+      <div class="flex flex-col items-center gap-3">
 
-  <div class="field">
-    <p><%= f.label :password %> <i>(leave blank if you don't want to change it)</i></p>
-    <p><%= f.password_field :password, autocomplete: "new-password" %></p>
-    <% if @minimum_password_length %>
-      <p><em><%= @minimum_password_length %> characters minimum</em></p>
+        <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-blue-500">
+          <% if current_user.avatar.attached? %>
+            <%= image_tag url_for(current_user.avatar), class: "w-full h-full object-cover" %>
+          <% else %>
+            <div class="w-full h-full bg-blue-600 flex items-center justify-center">
+              <span class="text-white text-4xl font-bold">
+                <%= current_user.email[0].upcase %>
+              </span>
+            </div>
+          <% end %>
+        </div>
+
+        <label class="cursor-pointer bg-blue-50 dark:bg-blue-900/30
+                      hover:bg-blue-100 dark:hover:bg-blue-900/50
+                      text-blue-600 dark:text-blue-400
+                      text-sm font-medium px-4 py-2 rounded-lg transition">
+          Upload Photo
+          <%= f.file_field :avatar, accept: "image/*", class: "hidden",
+              onchange: "previewImage(event)" %>
+        </label>
+
+        <% if current_user.avatar.attached? %>
+          <label class="flex items-center gap-2 text-sm text-red-500
+                        cursor-pointer hover:text-red-400 transition">
+            <input type="checkbox" name="user[remove_avatar]" value="1"
+                   class="w-4 h-4 accent-red-500">
+            Remove current picture
+          </label>
+        <% end %>
+
+        <img id="avatar_preview" src="#" alt="Preview"
+             class="hidden w-24 h-24 rounded-full object-cover border-4 border-green-400 mt-2">
+      </div>
+
+      <hr class="border-gray-200 dark:border-gray-600">
+
+      <div>
+        <%= f.label :email,
+            class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+        <%= f.email_field :email,
+            class: "w-full border border-gray-300 dark:border-gray-600
+                    bg-white dark:bg-gray-700
+                    text-gray-900 dark:text-white
+                    rounded-lg px-3 py-2 text-sm
+                    focus:outline-none focus:ring-2 focus:ring-blue-500",
+            autocomplete: "email" %>
+      </div>
+
+      <div>
+        <%= f.label :password, "New Password",
+            class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+        <%= f.password_field :password,
+            class: "w-full border border-gray-300 dark:border-gray-600
+                    bg-white dark:bg-gray-700
+                    text-gray-900 dark:text-white
+                    placeholder-gray-400 dark:placeholder-gray-500
+                    rounded-lg px-3 py-2 text-sm
+                    focus:outline-none focus:ring-2 focus:ring-blue-500",
+            autocomplete: "new-password",
+            placeholder: "Leave blank to keep current password" %>
+      </div>
+
+      <div>
+        <%= f.label :password_confirmation, "Confirm New Password",
+            class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+        <%= f.password_field :password_confirmation,
+            class: "w-full border border-gray-300 dark:border-gray-600
+                    bg-white dark:bg-gray-700
+                    text-gray-900 dark:text-white
+                    rounded-lg px-3 py-2 text-sm
+                    focus:outline-none focus:ring-2 focus:ring-blue-500",
+            autocomplete: "new-password" %>
+      </div>
+
+      <%= f.submit "Save Changes",
+          class: "w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold
+                  py-2 rounded-lg transition cursor-pointer" %>
+
     <% end %>
+
+    <div class="text-center mt-4">
+      <%= link_to "← Back to Feed", root_path,
+          class: "text-sm text-gray-500 dark:text-gray-400
+                  hover:text-blue-600 dark:hover:text-blue-400 transition" %>
+    </div>
+
   </div>
+</div>
 
-  <div class="field">
-    <p><%= f.label :password_confirmation %></p>
-    <p><%= f.password_field :password_confirmation, autocomplete: "new-password" %></p>
-  </div>
-
-  <div class="field">
-    <p><%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i></p>
-    <p><%= f.password_field :current_password, autocomplete: "current-password" %></p>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Update" %>
-  </div>
-<% end %>
-
-<h3>Cancel my account</h3>
-
-<div>Unhappy? <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete %></div>
-
-<%= link_to "Back", :back %>
+<script>
+  function previewImage(event) {
+    const preview = document.getElementById('avatar_preview')
+    const file = event.target.files[0]
+    if (file) {
+      preview.src = URL.createObjectURL(file)
+      preview.classList.remove('hidden')
+    }
+  }
+</script>

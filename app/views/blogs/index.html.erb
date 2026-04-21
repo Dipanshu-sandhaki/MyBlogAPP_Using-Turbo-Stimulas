@@ -1,59 +1,29 @@
-<div class="min-h-screen bg-gray-100 py-10" data-controller="bulk-select">
+<div class="page-wrapper min-h-screen bg-gray-100 dark:bg-gray-900 py-10" data-controller="bulk-select">
 
-  <!-- MAIN CENTER WRAPPER -->
+  <div class="max-w-5xl mx-auto px-6 mb-2 mt-4">
+    <%= link_to root_path,
+        class: "inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400
+                hover:text-blue-600 dark:hover:text-blue-400 transition" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+           viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M15 19l-7-7 7-7"/>
+      </svg>
+      Back to Feed
+    <% end %>
+  </div>
+
   <div class="max-w-2xl mx-auto px-6">
-
-    <!-- HEADING -->
-    <h1 class="text-4xl font-bold text-gray-800 text-center mb-8">
+    <h1 class="text-4xl font-bold text-gray-800 dark:text-white text-center mb-8">
       My Blogs
     </h1>
 
-    <!-- ACTION BAR -->
-    <div class="flex items-center justify-between mb-6">
-
-      <!-- LEFT : SELECT -->
-      <label class="flex items-center gap-2 text-sm cursor-pointer">
-        <input type="checkbox"
-               data-action="bulk-select#toggleAll"
-               class="w-4 h-4">
-        Select All
-      </label>
-
-      <!-- RIGHT : BUTTONS -->
-      <div class="flex items-center gap-3">
-
-        <!-- DELETE SELECTED -->
-        <button
-          data-bulk-select-target="deleteBtn"
-          data-action="bulk-select#deleteSelected"
-          class="hidden bg-red-600 text-white px-3 py-1 rounded-md shadow hover:bg-red-700 transition whitespace-nowrap">
-          Delete Selected
-        </button>
-
-        <!-- CREATE BLOG -->
-        <%= link_to new_blog_path,
-            data: { turbo_frame: "modal" },
-            class: "flex items-center gap-2 bg-blue-600 text-sm text-white px-3 py-1 rounded-md shadow hover:bg-blue-700 transition whitespace-nowrap" do %>
-          <span class="text-sm">+</span>
-          <span>Create Blog</span>
-        <% end %>
-
-        <!-- BULK UPLOAD -->
-        <%= link_to bulk_upload_blogs_path,
-            data: { turbo_frame: "modal" },
-            class: "flex items-center gap-2 bg-gray-800 text-sm text-white px-3 py-1.5 rounded-md shadow hover:bg-gray-900 transition whitespace-nowrap" do %>
-          <span>📂</span>
-          <span>Bulk Upload</span>
-        <% end %>
-
-      </div>
+    <div id="action_bar" class="mb-6">
+      <%= render "blogs/action_bar", blogs: @blogs %>
     </div>
 
-    <!-- BLOG LIST -->
     <div id="blogs" class="space-y-4">
       <%= render @blogs %>
     </div>
-
   </div>
-
 </div>

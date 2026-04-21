@@ -1,0 +1,3 @@
+<%= turbo_stream.replace "like_button_blog_#{@blog.id}" do %>
+  <%= render partial: "likes/like_button", locals: { blog: @blog, current_user: current_user } %>
+<% end %>

@@ -1,0 +1,7 @@
+<%= turbo_stream.prepend "comment_list_#{@blog.id}" do %>
+  <%= render @comment, blog: @blog, current_user: current_user %>
+<% end %>
+
+<%= turbo_stream.replace "comment_form_#{@blog.id}" do %>
+  <%= render "comments/form", blog: @blog, comment: Comment.new %>
+<% end %>

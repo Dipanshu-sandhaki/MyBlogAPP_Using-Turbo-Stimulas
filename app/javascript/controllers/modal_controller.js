@@ -3,54 +3,41 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["modal", "deleteModal"]
 
-connect() {
-  this.deleteUrl = null
-
-  this.handleKeydown = this.handleKeydown.bind(this)
-  this.handleFrameLoad = this.handleFrameLoad.bind(this)
-
-  document.addEventListener("keydown", this.handleKeydown)
-  document.addEventListener("turbo:frame-load", this.handleFrameLoad)
-}
-
-disconnect() {
-  document.removeEventListener("keydown", this.handleKeydown)
-  document.removeEventListener("turbo:frame-load", this.handleFrameLoad)
-}
-
-handleFrameLoad(event) {
-  if (event.target.id === "modal") {
-    this.open()
+  connect() {
+    this.deleteUrl = null
+    this.handleKeydown = this.handleKeydown.bind(this)
+    this.handleFrameLoad = this.handleFrameLoad.bind(this)
+    document.addEventListener("keydown", this.handleKeydown)
+    document.addEventListener("turbo:frame-load", this.handleFrameLoad)
   }
-}
 
   disconnect() {
     document.removeEventListener("keydown", this.handleKeydown)
+    document.removeEventListener("turbo:frame-load", this.handleFrameLoad)
   }
 
-  // ================= MODAL =================
+  handleFrameLoad(event) {
+    if (event.target.id === "modal") {
+      this.open()
+    }
+  }
 
   open() {
     this.modalTarget.classList.remove("hidden")
-
-    // scroll lock
     document.body.classList.add("overflow-hidden")
   }
 
   close() {
     this.modalTarget.classList.add("hidden")
-
     document.body.classList.remove("overflow-hidden")
   }
 
-  // click outside close
   backdropClose(event) {
     if (event.target === this.modalTarget) {
       this.close()
     }
   }
 
-  // ESC key close
   handleKeydown(event) {
     if (event.key === "Escape") {
       this.close()
@@ -58,14 +45,11 @@ handleFrameLoad(event) {
     }
   }
 
-  // turbo form submit success → close modal
   submitEnd(event) {
     if (event.detail.success) {
       this.close()
     }
   }
-
-  // ================= DELETE =================
 
   openDelete(event) {
     this.deleteUrl = event.currentTarget.dataset.url

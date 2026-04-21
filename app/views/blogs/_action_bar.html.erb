@@ -1,0 +1,47 @@
+<div id="action_bar" class="mb-6">
+  <% if blogs.empty? %>
+    <div class="flex justify-center gap-3">
+      <%= link_to new_blog_path,
+          class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition" do %>
+        + Create Blog
+      <% end %>
+      <%= link_to bulk_upload_blogs_path,
+          data: { turbo_frame: "modal" },
+          class: "bg-gray-800 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition" do %>
+        Bulk Upload
+      <% end %>
+    </div>
+
+  <% else %>
+    <div class="flex items-center justify-between">
+      <div>
+        <label data-bulk-select-target="selectAllLabel"
+               class="<%= blogs.size > 1 ? '' : 'hidden' %> flex items-center gap-2 text-sm cursor-pointer text-gray-700 dark:text-gray-300">
+          <input type="checkbox"
+                 data-action="bulk-select#toggleAll"
+                 class="w-4 h-4 accent-blue-600">
+          Select All
+        </label>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button data-bulk-select-target="deleteBtn"
+                data-action="bulk-select#deleteSelected"
+                class="hidden bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition">
+          Delete Selected
+        </button>
+
+        <%= link_to new_blog_path,
+            class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition" do %>
+          + Create Blog
+        <% end %>
+
+        <%= link_to bulk_upload_blogs_path,
+            data: { turbo_frame: "modal" },
+            class: "bg-gray-800 hover:bg-gray-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition" do %>
+          Bulk Upload
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
