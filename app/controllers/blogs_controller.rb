@@ -114,33 +114,20 @@ class BlogsController < ApplicationController
   end
 
   def bulk_delete
-    ids = params[:ids]
+  ids = params[:ids]
 
-    if ids.present?
-      current_user.blogs.where(id: ids).destroy_all
-
-      flash.now[:notice] = "Blogs deleted successfully"
-
-      render turbo_stream: [
-        *ids.map { |id| turbo_stream.remove("blog_#{id}") },
-
-        turbo_stream.replace(
-          "action_bar",
-          partial: "blogs/action_bar",
-          locals: { blogs: current_user.blogs.where(status: %w[saved published]) }
-        ),
-
-        turbo_stream.replace("flash", partial: "shared/flash")
-      ]
-    else
-      flash.now[:alert] = "No blogs selected"
-
-      render turbo_stream: turbo_stream.replace(
-        "flash",
-        partial: "shared/flash"
-      )
-    end
+  if ids.present?
+    current_user.blogs.where(id: ids).destroy_all
+    flash.now[:notice] = "Blogs deleted successfully"
+  else
+    flash.now[:alert] = "No blogs selected"
   end
+
+  respond_to do |format|
+    format.turbo_stream
+  end
+end
+
 
   def destroy
     @blog.destroy
