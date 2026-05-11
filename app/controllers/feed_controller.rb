@@ -5,7 +5,7 @@ class FeedController < ApplicationController
     followed_ids = current_user.following.pluck(:id)
     feed_ids = followed_ids + [current_user.id]
 
-    @blogs = Blog.where(user_id: feed_ids)
+    @blogs = Blog.where(user_id: feed_ids, status: "published")
                  .includes(:user, :likes, :comments)
                  .order(created_at: :desc)
 

@@ -3,12 +3,10 @@ import { Controller } from "@hotwired/stimulus";
 export default class extends Controller {
   static targets = ["checkbox", "actions", "deleteBtn", "selectAllLabel"];
 
-  // Fires automatically when a new blog card is added via Turbo Stream
   checkboxTargetConnected() {
     this.updateSelectAllVisibility();
   }
 
-  // Fires when a blog is deleted
   checkboxTargetDisconnected() {
     this.updateSelectAllVisibility();
     this.updateSelection()
@@ -69,7 +67,7 @@ export default class extends Controller {
       .then((res) => res.text())
       .then((html) => {
         Turbo.renderStreamMessage(html);
-        // Reset delete button after bulk delete
+        // Reset delete
         if (this.hasDeleteBtnTarget) {
           this.deleteBtnTarget.classList.add("hidden");
         }

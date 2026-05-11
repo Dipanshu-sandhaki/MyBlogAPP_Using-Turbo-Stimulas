@@ -3,30 +3,26 @@ Rails.application.routes.draw do
     registrations: "users/registrations"
   }
 
-  # ✅ Feed — home page
   root "feed#index"
 
-  # ✅ My blogs
-  get "/my-blogs", to: "blogs#index", as: :my_blogs
+  get "/my-blogs",  to: "blogs#index",  as: :my_blogs
+  get "/drafts",    to: "blogs#drafts", as: :drafts
 
   resources :blogs do
-    # ✅ Bulk actions (from old code)
     collection do
-      get :bulk_upload
+      get  :bulk_upload
       post :bulk_create
       delete :bulk_delete
     end
 
-    # ✅ Likes & Comments
-    resources :likes, only: [:create, :destroy]
+    resources :likes,    only: [:create, :destroy]
     resources :comments, only: [:create, :destroy, :update]
   end
 
-  # ✅ Follow / Unfollow
   resources :users, only: [] do
-  member do
-    post :follow, to: "follows#create"
-    delete :unfollow, to: "follows#destroy"
+    member do
+      post   :follow,   to: "follows#create"
+      delete :unfollow, to: "follows#destroy"
+    end
   end
-end
 end

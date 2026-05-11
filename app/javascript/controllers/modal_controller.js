@@ -53,12 +53,16 @@ export default class extends Controller {
 
   openDelete(event) {
     this.deleteUrl = event.currentTarget.dataset.url
-    this.deleteModalTarget.classList.remove("hidden")
+    if (this.hasDeleteModalTarget) {
+  this.deleteModalTarget.classList.remove("hidden")
+}
     document.body.classList.add("overflow-hidden")
   }
 
   closeDelete() {
-    this.deleteModalTarget.classList.add("hidden")
+    if (this.hasDeleteModalTarget) {
+      this.deleteModalTarget.classList.add("hidden")
+    }
     document.body.classList.remove("overflow-hidden")
   }
 

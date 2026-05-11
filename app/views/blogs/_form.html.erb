@@ -1,14 +1,14 @@
-<div class="min-h-screen bg-gray-950 py-10 px-4" data-controller="blog-editor">
+<div class="be-page min-h-screen py-10 px-4" data-controller="blog-editor">
   <div class="max-w-3xl mx-auto">
 
     <div class="mb-8">
-      <%= link_to my_blogs_path,
-          class: "inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition mb-5" do %>
+      <%= link_to my_blogs_path, class: "be-back-link" do %>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
         Back to My Blogs
       <% end %>
+
       <div class="flex items-center gap-3 mt-2">
         <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,10 +17,10 @@
           </svg>
         </div>
         <div>
-          <h1 class="text-2xl font-bold text-white tracking-tight">
+          <h1 class="be-heading">
             <%= blog.persisted? ? "Edit Blog" : "New Blog" %>
           </h1>
-          <p class="text-sm text-gray-500 mt-0.5">
+          <p class="be-subheading">
             <%= blog.persisted? ? "Update your post" : "Write something worth reading" %>
           </p>
         </div>
@@ -30,10 +30,10 @@
     <%= form_with(model: blog, local: true, html: { enctype: "multipart/form-data" }) do |f| %>
 
       <% if blog.errors.any? %>
-        <div class="mb-5 bg-red-950 border border-red-800 rounded-xl p-4">
-          <p class="text-red-400 text-sm font-medium mb-1">Please fix the following:</p>
+        <div class="be-error-box">
+          <p class="be-error-title">Please fix the following:</p>
           <% blog.errors.full_messages.each do |msg| %>
-            <p class="text-red-300 text-sm mt-1">• <%= msg %></p>
+            <p class="be-error-msg">• <%= msg %></p>
           <% end %>
         </div>
       <% end %>
@@ -48,13 +48,13 @@
         <div class="form-field be-card">
           <label class="be-label">Cover Image <span class="be-optional">(optional)</span></label>
           <% if blog.persisted? && blog.cover_image.attached? %>
-            <%= image_tag blog.cover_image, class: "w-full max-h-48 object-cover rounded-lg mb-3 border border-gray-700" %>
+            <%= image_tag blog.cover_image, class: "w-full max-h-48 object-cover rounded-lg mb-3 border border-gray-200 dark:border-gray-700" %>
           <% end %>
           <label class="cursor-pointer flex items-center gap-3 group">
             <div class="be-file-btn group-hover:bg-indigo-600 group-hover:border-indigo-500 group-hover:text-white">
               Choose file
             </div>
-            <span class="text-sm text-gray-500" id="file-label">No file chosen</span>
+            <span class="be-file-label" id="file-label">No file chosen</span>
             <%= f.file_field :cover_image, accept: "image/*", class: "hidden", id: "cover_image_input", onchange: "previewCover(this)" %>
           </label>
           <img id="cover-preview" class="cover-preview" alt="Cover preview" />
@@ -150,12 +150,73 @@
           <%= f.rich_text_area :content, toolbar: "blog-toolbar", class: "trix-content" %>
         </div>
 
-        <div class="form-field pt-2 flex items-center gap-3">
-          <%= f.submit blog.persisted? ? "Update Blog" : "Publish Blog",
-              class: "flex-1 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.99] text-white py-3 rounded-xl font-semibold transition cursor-pointer text-base" %>
-          <%= link_to "Discard", my_blogs_path,
-              class: "px-6 py-3 rounded-xl border border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white transition text-sm" %>
-        </div>
+        <%# ── Action buttons — Save Draft / Save / Publish / Discard ── %>
+<div class="form-field pt-2">
+
+  <% if blog.persisted? %>
+    <p class="text-xs text-gray-400 dark:text-gray-500 mb-3">
+      Current status:
+      <span class="font-semibold
+        <%= blog.draft?     ? 'text-amber-500'   :
+            blog.saved?     ? 'text-emerald-500' :
+                              'text-indigo-500'  %>">
+        <%= blog.status.capitalize %>
+      </span>
+    </p>
+  <% end %>
+
+  <!-- ✅ SINGLE CLEAN WRAPPER -->
+  <div class="flex items-center justify-between
+              pt-5 mt-6 border-t border-gray-200 dark:border-gray-700">
+
+    <%# LEFT: Discard %>
+    <%= link_to (blog.new_record? ? my_blogs_path : :back),
+        data: { turbo_confirm: "Discard all changes and leave?" },
+        class: "inline-flex items-center gap-2 h-10 px-5 rounded-xl
+                bg-red-600 hover:bg-red-700
+                text-white text-sm font-semibold
+                transition-all duration-150" do %>
+      Discard
+    <% end %>
+
+    <%# RIGHT: Actions %>
+    <div class="flex items-center gap-6">
+
+      <%# Save Draft %>
+      <%= f.submit "Save Draft",
+          name: "commit",
+          class: "inline-flex items-center justify-center px-4 h-10 rounded-xl
+                  text-sm font-medium
+                  bg-gray-100 dark:bg-gray-700
+                  text-gray-700 dark:text-gray-300
+                  hover:bg-gray-200 dark:hover:bg-gray-600
+                  border border-gray-300 dark:border-gray-600
+                  transition" %>
+
+      <%# Save %>
+      <%= f.submit "Save",
+          name: "commit",
+          class: "inline-flex items-center justify-center px-4 h-10 rounded-xl
+                  text-sm font-medium
+                  bg-gray-200 dark:bg-gray-600
+                  text-gray-800 dark:text-gray-200
+                  hover:bg-gray-300 dark:hover:bg-gray-500
+                  transition" %>
+
+      <%# Publish %>
+      <%= f.submit "Publish",
+          name: "commit",
+          class: "inline-flex items-center justify-center px-5 h-10 rounded-xl
+                  text-sm font-semibold
+                  text-white
+                  bg-indigo-600 hover:bg-indigo-500
+                  dark:bg-indigo-500 dark:hover:bg-indigo-400
+                  shadow-md
+                  transition-all duration-150" %>
+
+    </div>
+  </div>
+</div>
 
       </div>
     <% end %>
