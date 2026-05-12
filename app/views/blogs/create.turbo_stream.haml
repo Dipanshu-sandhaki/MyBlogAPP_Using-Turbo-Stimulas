@@ -1,0 +1,8 @@
+= turbo_stream.prepend "blogs" do
+  = render @blog
+= turbo_stream.replace "action_bar" do
+  = render "blogs/action_bar", blogs: current_user.blogs.order(created_at: :desc)
+= turbo_stream.replace "modal" do
+  %turbo-frame#modal
+= turbo_stream.replace "flash" do
+  = render "shared/flash"

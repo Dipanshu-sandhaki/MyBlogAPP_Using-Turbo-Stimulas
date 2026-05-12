@@ -1,0 +1,5 @@
+= turbo_stream.remove dom_id(@blog)
+= turbo_stream.replace "action_bar" do
+  = render "blogs/action_bar", blogs: current_user.blogs.order(created_at: :desc)
+= turbo_stream.replace "flash" do
+  = render "shared/flash"

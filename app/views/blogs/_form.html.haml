@@ -1,0 +1,168 @@
+.be-page.min-h-screen.py-10.px-4{"data-blog-editor-original-status-value" => "#{blog.persisted? ? blog.status : 'new'}", "data-controller" => "blog-editor"}
+  .max-w-3xl.mx-auto
+    .mb-8
+      %a.be-back-link{"data-action" => "click->blog-editor#goBack", "data-destination" => my_blogs_path, href: my_blogs_path}
+        %svg.w-4.h-4{fill: "none", stroke: "currentColor", viewbox: "0 0 24 24"}
+          %path{d: "M10 19l-7-7m0 0l7-7m-7 7h18", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2"}
+        Back to My Blogs
+      .flex.items-center.gap-3.mt-2
+        .w-9.h-9.rounded-lg.bg-indigo-600.flex.items-center.justify-center.shrink-0
+          %svg.w-5.h-5.text-white{fill: "none", stroke: "currentColor", viewbox: "0 0 24 24"}
+            %path{d: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2"}
+        %div
+          %h1.be-heading
+            = blog.persisted? ? "Edit Blog" : "New Blog"
+          %p.be-subheading
+            = blog.persisted? ? "Update your post" : "Write something worth reading"
+    = form_with(model: blog, local: true,          |
+      html: { enctype: "multipart/form-data",      |
+              "data-blog-editor-target": "form" }, |
+      data: { turbo_frame: "_top" }) do |f|        |
+      - if blog.errors.any?
+        .be-error-box
+          %p.be-error-title Please fix the following:
+          - blog.errors.full_messages.each do |msg|
+            %p.be-error-msg
+              • #{msg}
+      .space-y-5
+        .form-field
+          %label.be-label
+            Title
+            %span.text-indigo-400 *
+          = f.text_field :title,                          |
+            placeholder: "Your blog title...",            |
+            class: "be-input text-xl font-semibold",      |
+            "data-action": "input->blog-editor#markDirty" |
+        .form-field.be-card
+          %label.be-label
+            Cover Image
+            %span.be-optional (optional)
+          - if blog.persisted? && blog.cover_image.attached?
+            = image_tag blog.cover_image,                                                                       |
+              class: "w-full max-h-48 object-cover rounded-lg mb-3 border border-gray-200 dark:border-gray-700" |
+          %label.cursor-pointer.flex.items-center.gap-3.group
+            .be-file-btn.group-hover:bg-indigo-600.group-hover:border-indigo-500.group-hover:text-white
+              Choose file
+            %span#file-label.be-file-label No file chosen
+            = f.file_field :cover_image,     |
+              accept: "image/*",             |
+              class: "hidden",               |
+              id: "cover_image_input",       |
+              onchange: "previewCover(this)" |
+          %img#cover-preview.cover-preview{alt: "Cover preview"}/
+        .form-field
+          %label.be-label
+            Content
+            %span.text-indigo-400 *
+          %trix-toolbar#blog-toolbar
+            .be-toolbar
+              .be-group
+                %button.be-btn{"data-trix-action" => "undo", title: "Undo", type: "button"}
+                  %svg{viewbox: "0 0 24 24"}
+                    %path{d: "M3 7v6h6"}
+                    %path{d: "M3 13a9 9 0 1 0 2.34-6"}
+                %button.be-btn{"data-trix-action" => "redo", title: "Redo", type: "button"}
+                  %svg{viewbox: "0 0 24 24"}
+                    %path{d: "M21 7v6h-6"}
+                    %path{d: "M21 13a9 9 0 1 1-2.34-6"}
+              .be-group
+                %button.be-btn.be-btn--text{"data-trix-attribute" => "bold", style: "font-weight:900", title: "Bold", type: "button"} B
+                %button.be-btn.be-btn--text{"data-trix-attribute" => "italic", style: "font-style:italic", title: "Italic", type: "button"} I
+                %button.be-btn.be-btn--text{"data-trix-attribute" => "strike", style: "text-decoration:line-through", title: "Strikethrough", type: "button"} S
+              .be-group
+                %button.be-btn{"data-action" => "click->blog-editor#increaseFontSize", title: "Larger text", type: "button"}
+                  %svg{viewbox: "0 0 24 24"}
+                    %text{fill: "currentColor", "font-size" => "14", "font-weight" => "700", x: "2", y: "17"} A
+                    %text{fill: "currentColor", "font-size" => "9", x: "13", y: "13"} +
+                %button.be-btn{"data-action" => "click->blog-editor#decreaseFontSize", title: "Smaller text", type: "button"}
+                  %svg{viewbox: "0 0 24 24"}
+                    %text{fill: "currentColor", "font-size" => "14", "font-weight" => "700", x: "2", y: "17"} A
+                    %text{fill: "currentColor", "font-size" => "11", x: "13", y: "16"} -
+              .be-group
+                %button.be-btn.be-btn--color{"data-action" => "click->blog-editor#openColorPicker", title: "Text color", type: "button"}
+                  %svg{viewbox: "0 0 24 24"}
+                    %text{fill: "currentColor", "font-size" => "13", "font-weight" => "700", x: "4", y: "16"} A
+                    %rect#color-indicator{fill: "#6366f1", height: "3", rx: "1", width: "16", x: "4", y: "18"}
+                  %input#text-color-picker.be-color-input{"data-action" => "input->blog-editor#applyColor", type: "color", value: "#6366f1"}/
+              .be-group
+                %button.be-btn.be-btn--text{"data-action" => "click->blog-editor#toggleCase", title: "Toggle case", type: "button"} Aa
+              .be-group
+                %button.be-btn.be-btn--text{"data-trix-attribute" => "heading1", title: "Heading 1", type: "button"} H₁
+                %button.be-btn{"data-trix-attribute" => "quote", title: "Blockquote", type: "button"}
+                  %svg{viewbox: "0 0 24 24"}
+                    %path{d: "M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"}
+                    %path{d: "M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"}
+                %button.be-btn.be-btn--text{"data-trix-attribute" => "code", title: "Code", type: "button"} &lt;/&gt;
+              .be-group
+                %button.be-btn{"data-trix-attribute" => "bullet", title: "Bullet list", type: "button"}
+                  %svg{viewbox: "0 0 24 24"}
+                    %line{x1: "9", x2: "20", y1: "6", y2: "6"}
+                    %line{x1: "9", x2: "20", y1: "12", y2: "12"}
+                    %line{x1: "9", x2: "20", y1: "18", y2: "18"}
+                    %circle{cx: "4", cy: "6", fill: "currentColor", r: "1.5"}
+                    %circle{cx: "4", cy: "12", fill: "currentColor", r: "1.5"}
+                    %circle{cx: "4", cy: "18", fill: "currentColor", r: "1.5"}
+                %button.be-btn{"data-trix-attribute" => "number", title: "Numbered list", type: "button"}
+                  %svg{viewbox: "0 0 24 24"}
+                    %line{x1: "10", x2: "21", y1: "6", y2: "6"}
+                    %line{x1: "10", x2: "21", y1: "12", y2: "12"}
+                    %line{x1: "10", x2: "21", y1: "18", y2: "18"}
+                    %path{d: "M4 6h1v4"}
+                    %path{d: "M4 10h2"}
+                    %path{d: "M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"}
+              .be-group
+                %button.be-btn{"data-action" => "click->blog-editor#toggleLinkDialog", title: "Link", type: "button"}
+                  %svg{fill: "none", stroke: "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", viewbox: "0 0 24 24"}
+                    %path{d: "M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"}
+                    %path{d: "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"}
+            #be-link-dialog.be-link-dialog{style: "display:none;"}
+              .be-link-row
+                %svg.be-link-icon{fill: "none", stroke: "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", viewbox: "0 0 24 24"}
+                  %path{d: "M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"}
+                  %path{d: "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"}
+                %input#be-link-url-input.be-link-input{placeholder: "Paste or type URL…", type: "url"}/
+                %button.be-link-btn.be-link-btn--apply{"data-action" => "click->blog-editor#applyLink", type: "button"} Apply
+                %button.be-link-btn.be-link-btn--remove{"data-action" => "click->blog-editor#removeLink", type: "button"} Remove
+          = f.rich_text_area :content,                          |
+            toolbar: "blog-toolbar",                            |
+            class: "trix-content",                              |
+            "data-action": "trix-change->blog-editor#markDirty" |
+        .form-field.pt-2
+          - if blog.persisted?
+            %p.text-xs.text-gray-400.dark:text-gray-500.mb-3
+              Current status:
+              %span.font-semibold.:.:{class: "#{blog.draft? ? 'text-amber-500' blog.saved? ? 'text-emerald-500' 'text-indigo-500'}"}
+                = blog.status.capitalize
+          .flex.items-center.justify-between.pt-5.mt-6.border-t.border-gray-200.dark:border-gray-700
+            %button.inline-flex.items-center.gap-2.h-10.px-5.rounded-xl.bg-red-600.hover:bg-red-700.text-white.text-sm.font-semibold.transition-all.duration-150{"data-action" => "click->blog-editor#discard", "data-destination" => my_blogs_path, type: "button"}
+              Discard
+            .flex.items-center.gap-3
+              %span.text-xs.text-gray-400.dark:text-gray-500.hidden.transition-all.duration-300{"data-blog-editor-target" => "saveStatus"}
+              = f.submit "Save",                                                     |
+                name: "commit",                                                      |
+                class: "inline-flex items-center justify-center px-4 h-10 rounded-xl |
+                text-sm font-medium cursor-pointer                                   |
+                bg-gray-200 dark:bg-gray-600                                         |
+                text-gray-800 dark:text-gray-200                                     |
+                hover:bg-gray-300 dark:hover:bg-gray-500                             |
+                transition"                                                          |
+              = f.submit "Publish",                                                  |
+                name: "commit",                                                      |
+                class: "inline-flex items-center justify-center px-5 h-10 rounded-xl |
+                text-sm font-semibold cursor-pointer                                 |
+                text-white                                                           |
+                bg-indigo-600 hover:bg-indigo-500                                    |
+                dark:bg-indigo-500 dark:hover:bg-indigo-400                          |
+                shadow-md                                                            |
+                transition-all duration-150"                                         |
+:javascript
+  function previewCover(input) {
+    const label   = document.getElementById('file-label')
+    const preview = document.getElementById('cover-preview')
+    if (input.files?.[0]) {
+      label.textContent = input.files[0].name
+      const r = new FileReader()
+      r.onload = e => { preview.src = e.target.result; preview.style.display = 'block' }
+      r.readAsDataURL(input.files[0])
+    }
+  }

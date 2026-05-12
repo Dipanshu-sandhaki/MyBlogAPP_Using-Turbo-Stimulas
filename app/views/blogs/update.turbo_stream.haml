@@ -1,0 +1,11 @@
+- if @blog.errors.any?
+  = turbo_stream.replace "modal" do
+    %turbo-frame#modal
+      = render "blogs/form", blog: @blog
+- else
+  = turbo_stream.replace dom_id(@blog) do
+    = render @blog
+  = turbo_stream.replace "modal" do
+    %turbo-frame#modal
+= turbo_stream.replace "flash" do
+  = render "shared/flash"

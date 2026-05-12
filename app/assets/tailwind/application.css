@@ -2,13 +2,16 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-html.dark,
-html.dark body {
-  background-color: #111827 !important;
+html,
+body {
+  background-color: #f3f4f6;
+  color: #111827;
 }
 
-html.dark .page-wrapper {
-  background-color: #111827 !important;
+html.dark,
+html.dark body {
+  background-color: #030712 !important;
+  color: #f9fafb;
 }
 
 @keyframes slide-in {

@@ -1,0 +1,128 @@
+.min-h-screen.transition-colors.duration-300
+  .max-w-3xl.mx-auto.px-6.py-10
+    = link_to my_blogs_path,                                                                      |
+      class: "inline-flex items-center gap-1.5 text-sm font-bold tracking-wide                    |
+      text-gray-900 dark:text-white                                                               |
+      hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150 mb-10 block" do |
+      %svg.w-4.h-4.stroke-current{fill: "none", stroke: "currentColor", "stroke-width" => "2.5", viewbox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg"}
+        %path{d: "M15 19l-7-7 7-7", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+      Back to My Blogs
+    .mb-10.border-b.border-gray-300.dark:border-gray-500.pb-6
+      %h1.text-4xl.font-extrabold.tracking-tight.text-gray-900.dark:text-white
+        Drafts
+      %p.mt-2.text-base.font-medium.text-gray-600.dark:text-gray-300
+        = (@drafts.empty? && @page == 1) ? "Nothing in progress yet." : "Pick up right where you left off."
+    - if @drafts.empty? && @page == 1
+      .flex.flex-col.items-center.justify-center.py-20.text-center.bg-white.dark:bg-gray-800.rounded-3xl.border.border-gray-200.dark:border-gray-700.shadow-sm
+        .relative.mb-8
+          .w-24.h-24.rounded-3xl.bg-gray-50.dark:bg-gray-900.border-2.border-dashed.border-gray-300.dark:border-gray-600.flex.items-center.justify-center.shadow-inner
+            %svg.w-10.h-10.text-gray-800.dark:text-white.stroke-current{fill: "none", stroke: "currentColor", "stroke-width" => "1.5", viewbox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg"}
+              %path{d: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+          %span.absolute.-top-1.-right-1.rounded-full.bg-blue-500.border-2.border-white.dark:border-gray-800{class: "w-3.5 h-3.5"}
+          %span.absolute.-bottom-1.-left-1.rounded-full.bg-blue-500.border-2.border-white.dark:border-gray-800{class: "w-2.5 h-2.5"}
+        %h3.text-xl.font-bold.text-gray-900.dark:text-white.mb-2 No drafts saved yet
+    - else
+      %turbo-frame{id: "drafts_page_#{@page}"}
+        .space-y-5
+          - @drafts.each_with_index do |draft, i|
+            .group.bg-white.dark:bg-gray-800.rounded-2xl.border.border-gray-200.dark:border-gray-600.hover:border-blue-400.dark:hover:border-blue-500.hover:shadow-xl.hover:-translate-y-1.transition-all.duration-300.ease-out.overflow-hidden{class: "dark:hover:shadow-blue-900/20", style: "animation: fadeUp 0.4s ease-out both; animation-delay: #{(i % 10) * 80}ms"}
+              .p-6
+                .flex.items-start.gap-5
+                  - if draft.cover_image.attached?
+                    .shrink-0.w-20.h-20.sm:w-24.sm:h-24.rounded-xl.overflow-hidden.border.border-gray-100.dark:border-gray-700.shadow-sm.mt-1
+                      = image_tag draft.cover_image, class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  .flex-1.min-w-0.flex.flex-col.justify-center
+                    .flex.items-center.gap-3.mb-3
+                      %span.inline-flex.items-center.py-1.rounded-md.text-sm.font-bold.bg-amber-100.text-amber-800.border.border-amber-200.dark:text-amber-400{class: "gap-1.5 px-2.5 dark:bg-amber-500/20 dark:border-amber-500/30"}
+                        Draft
+                      %span.text-xs.font-medium.text-gray-500.dark:text-gray-400
+                        Last edited #{time_ago_in_words(draft.updated_at)} ago
+                    %h2.text-xl.font-extrabold.text-gray-900.dark:text-white.leading-tight.truncate.mb-2
+                      = draft.title.present? ? draft.title : "Untitled Draft"
+                    - excerpt = draft.content.to_plain_text.strip
+                    - if excerpt.present?
+                      %p.text-sm.font-medium.text-gray-600.dark:text-gray-300.leading-relaxed.line-clamp-2
+                        = excerpt.truncate(150)
+                    - else
+                      %p.text-sm.font-medium.text-gray-400.dark:text-gray-500.italic No content written yet…
+                .mt-6.pt-5.border-t.border-gray-300.dark:border-gray-500.flex.items-center.gap-3
+                  = link_to edit_blog_path(draft),                                                  |
+                    class: "inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold |
+                            bg-gray-900 dark:bg-white text-white dark:text-gray-900                 |
+                            hover:bg-blue-600 dark:hover:bg-blue-500 dark:hover:text-white          |
+                            shadow-md hover:shadow-lg transition-all duration-200",                 |
+                    data: { turbo: false } do                                                       |
+                    %svg.w-4.h-4.stroke-current{fill: "none", stroke: "currentColor", "stroke-width" => "2.5", viewbox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg"}
+                      %path{d: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+                    Continue Writing
+                  = button_to blog_path(draft),                                                     |
+                    method: :patch,                                                                 |
+                    params: { blog: { status: "published" }, commit: "Publish" },                   |
+                    form: { data: { turbo_frame: "_top" } },                                        |
+                    class: "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold |
+                    bg-gray-100 dark:bg-gray-700                                                    |
+                    text-gray-900 dark:text-white                                                   |
+                    hover:bg-gray-200 hover:text-black                                              |
+                    dark:hover:bg-blue-500 dark:hover:text-white                                    |
+                    transition-all duration-200" do                                                 |
+                    %svg.w-4.h-4.stroke-current{fill: "none", stroke: "currentColor", "stroke-width" => "2.5", viewbox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg"}
+                      %path{d: "M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+                    Publish Now
+                  %button.ml-auto.inline-flex.items-center.gap-2.px-4.rounded-xl.text-sm.font-bold.bg-red-600.text-white.border.border-red-700.hover:bg-red-700.transition-all.duration-200{class: "py-2.5", "data-modal-target" => "deleteModal-#{draft.id}", "data-modal-toggle" => "deleteModal-#{draft.id}", type: "button"}
+                    %svg.w-4.h-4.stroke-current{fill: "none", stroke: "currentColor", "stroke-width" => "2.5", viewbox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg"}
+                      %path{d: "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+                    Delete
+            .hidden.overflow-y-auto.overflow-x-hidden.fixed.top-0.right-0.left-0.z-50.justify-center.items-center.w-full.md:inset-0.max-h-full.backdrop-blur-sm.transition-opacity{class: "h-[calc(100%-1rem)] bg-gray-900/60 dark:bg-gray-900/80", id: "deleteModal-#{draft.id}", tabindex: "-1"}
+              .relative.p-4.w-full.max-w-md.max-h-full
+                .relative.bg-white.dark:bg-gray-800.rounded-2xl.shadow-2xl.border.border-gray-200.dark:border-gray-700
+                  %button.absolute.top-4.right-4.text-gray-400.bg-transparent.hover:bg-gray-200.hover:text-gray-900.rounded-lg.text-sm.w-8.h-8.ms-auto.inline-flex.justify-center.items-center.dark:hover:bg-gray-600.dark:hover:text-white.transition-colors{"data-modal-hide" => "deleteModal-#{draft.id}", type: "button"}
+                    %svg.w-3.h-3{"aria-hidden" => "true", fill: "none", viewbox: "0 0 14 14", xmlns: "http://www.w3.org/2000/svg"}
+                      %path{d: "m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6", stroke: "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2"}
+                    %span.sr-only Close modal
+                  .p-6.text-center
+                    .mx-auto.mb-5.flex.items-center.justify-center.w-14.h-14.rounded-full.bg-red-100{class: "dark:bg-red-900/40"}
+                      %svg.w-7.h-7.text-red-600.dark:text-red-500{"aria-hidden" => "true", fill: "none", viewbox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg"}
+                        %path{d: "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16", stroke: "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2"}
+                    %h3.mb-2.text-xl.font-bold.text-gray-900.dark:text-white Delete Draft?
+                    %p.mb-6.text-sm.text-gray-500.dark:text-gray-400
+                      Are you sure you want to permanently delete
+                      %br/
+                      = succeed "?" do
+                        %span.font-semibold.text-gray-700.dark:text-gray-300
+                          "#{draft.title.present? ? draft.title : 'Untitled Draft'}"
+                      %br/
+                      This cannot be undone.
+                    .flex.justify-center.items-center.gap-3
+                      %button.px-5.text-sm.font-bold.text-gray-700.dark:text-gray-300.bg-white.dark:bg-gray-800.border.border-gray-300.dark:border-gray-600.rounded-xl.hover:bg-gray-50.dark:hover:bg-gray-700.focus:ring-4.focus:outline-none.focus:ring-gray-100.dark:focus:ring-gray-700.transition-all{class: "py-2.5", "data-modal-hide" => "deleteModal-#{draft.id}", type: "button"}
+                        Cancel
+                      = button_to blog_path(draft), method: :delete, form: { class: "m-0", data: { turbo: false } }, class: "px-5 py-2.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 rounded-xl shadow-md transition-all inline-flex items-center justify-center" do
+                        Yes, Delete
+        - if @has_more
+          %turbo-frame{id: "drafts_page_#{@page + 1}"}
+            .mt-8.flex.justify-center.pb-4
+              = link_to drafts_path(page: @page + 1),                                                         |
+                class: "inline-flex items-center gap-2 px-8 py-3 rounded-full text-sm font-bold tracking-wide |
+                bg-white dark:bg-gray-800 text-gray-900 dark:text-white                                       |
+                border-2 border-gray-200 dark:border-gray-700                                                 |
+                hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-400 dark:hover:text-blue-400 |
+                shadow-sm hover:shadow-md transition-all duration-200 group" do                               |
+                %svg.w-4.h-4.stroke-current.group-hover:animate-bounce{fill: "none", "stroke-width" => "2.5", viewbox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg"}
+                  %path{d: "M19 9l-7 7-7-7", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+                Load More
+:css
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+:javascript
+  function initializeFlowbite() {
+    if (typeof initFlowbite === 'function') {
+      setTimeout(() => initFlowbite(), 50);
+    }
+  }
+
+  // Initial load
+  initializeFlowbite();
+
+  // Run whenever new drafts are loaded via Turbo Frame
+  document.addEventListener("turbo:frame-load", initializeFlowbite);

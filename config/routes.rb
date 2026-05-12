@@ -3,6 +3,8 @@ Rails.application.routes.draw do
     registrations: "users/registrations"
   }
 
+  resource :profile, only: [:edit, :update]
+
   root "feed#index"
 
   get "/my-blogs",  to: "blogs#index",  as: :my_blogs

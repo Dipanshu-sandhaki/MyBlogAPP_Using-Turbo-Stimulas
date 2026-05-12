@@ -7,13 +7,18 @@ export default class extends Controller {
     this.deleteUrl = null
     this.handleKeydown = this.handleKeydown.bind(this)
     this.handleFrameLoad = this.handleFrameLoad.bind(this)
+    this.handleTurboVisit = this.handleTurboVisit.bind(this)
+
     document.addEventListener("keydown", this.handleKeydown)
     document.addEventListener("turbo:frame-load", this.handleFrameLoad)
+    document.addEventListener("turbo:visit", this.handleTurboVisit)
   }
 
   disconnect() {
     document.removeEventListener("keydown", this.handleKeydown)
     document.removeEventListener("turbo:frame-load", this.handleFrameLoad)
+    document.removeEventListener("turbo:visit", this.handleTurboVisit)
+    this._unlockScroll()
   }
 
   handleFrameLoad(event) {
@@ -22,19 +27,28 @@ export default class extends Controller {
     }
   }
 
+  handleTurboVisit() {
+    this._unlockScroll()
+  }
+
   open() {
     this.modalTarget.classList.remove("hidden")
-    document.body.classList.add("overflow-hidden")
+    this._lockScroll()
   }
 
   close() {
     this.modalTarget.classList.add("hidden")
-    document.body.classList.remove("overflow-hidden")
+    const frame = this.modalTarget.querySelector("turbo-frame#modal")
+    if (frame) frame.innerHTML = ""
+    this._unlockScroll()
   }
 
   backdropClose(event) {
     if (event.target === this.modalTarget) {
       this.close()
+    }
+    if (event.target === this.deleteModalTarget) {
+      this.closeDelete()
     }
   }
 
@@ -54,16 +68,17 @@ export default class extends Controller {
   openDelete(event) {
     this.deleteUrl = event.currentTarget.dataset.url
     if (this.hasDeleteModalTarget) {
-  this.deleteModalTarget.classList.remove("hidden")
-}
-    document.body.classList.add("overflow-hidden")
+      this.deleteModalTarget.classList.remove("hidden")
+    }
+    this._lockScroll()
   }
 
   closeDelete() {
     if (this.hasDeleteModalTarget) {
       this.deleteModalTarget.classList.add("hidden")
     }
-    document.body.classList.remove("overflow-hidden")
+    this.deleteUrl = null
+    this._unlockScroll()
   }
 
   confirmDelete() {
@@ -81,5 +96,13 @@ export default class extends Controller {
         window.location.reload()
       }
     })
+  }
+
+  _lockScroll() {
+    document.body.classList.add("overflow-hidden")
+  }
+
+  _unlockScroll() {
+    document.body.classList.remove("overflow-hidden")
   }
 }

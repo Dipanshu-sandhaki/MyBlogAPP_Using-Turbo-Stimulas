@@ -1,4 +1,5 @@
 <div id="<%= dom_id(blog) %>"
+     style="animation: fadeUp 0.4s ease-out both; animation-delay: <%= (local_assigns[:blog_counter] || 0) % 5 * 80 %>ms"
      class="group bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-700
             shadow-sm hover:shadow-xl dark:hover:shadow-black/40 hover:-translate-y-1
             hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-300 ease-out overflow-hidden">
@@ -45,7 +46,7 @@
       </div>
     </div>
 
-    <%# ── RIGHT: icon action buttons ── %>
+    <%# -- RIGHT: icon action buttons -- %>
     <div data-bulk-select-target="actions"
          class="flex sm:flex-col items-center gap-2.5 shrink-0 self-start sm:self-center mt-3 sm:mt-0">
 
@@ -63,7 +64,8 @@
 
       <%# EDIT %>
       <%= link_to edit_blog_path(blog),
-          title: "Edit",
+    title: "Edit",
+    data: { turbo: false },
           class: "p-2.5 rounded-xl bg-yellow-50 dark:bg-gray-700 text-yellow-600 dark:text-yellow-400
                   hover:bg-yellow-100 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-200 shadow-sm hover:shadow-md" do %>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
@@ -72,18 +74,19 @@
       <% end %>
 
       <%# PUBLISH %>
-      <% if !blog.published? %>
-        <%= button_to blog_path(blog),
-            method: :patch,
-            params: { blog: { status: "published" }, commit: "Publish" },
-            title: "Publish to feed",
-            class: "p-2.5 rounded-xl bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400
-                    hover:bg-indigo-100 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-200 shadow-sm hover:shadow-md" do %>
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
-          </svg>
-        <% end %>
-      <% end %>
+  <% if !blog.published? %>
+  <%= button_to blog_path(blog),
+      method: :patch,
+      params: { blog: { status: "published" }, commit: "Publish" },
+      title: "Publish to feed",
+      data: { turbo_frame: "_top" },
+      class: "p-2.5 rounded-xl bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400
+              hover:bg-indigo-100 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-200 shadow-sm hover:shadow-md" do %>
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+    </svg>
+  <% end %>
+<% end %>
 
       <%# DELETE %>
       <button type="button"

@@ -107,19 +107,20 @@
                   <% end %>
 
                   <%= button_to blog_path(draft),
-                      method: :patch,
-                      params: { blog: { status: "published" }, commit: "Publish" },
-                      class: "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold
-                              bg-gray-100 dark:bg-gray-700
-                              text-gray-900 dark:text-white
-                              hover:bg-gray-200 hover:text-black
-                              dark:hover:bg-blue-500 dark:hover:text-white
-                              transition-all duration-200" do %>
-                    <svg class="w-4 h-4 stroke-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-                    </svg>
-                    Publish Now
-                  <% end %>
+    method: :patch,
+    params: { blog: { status: "published" }, commit: "Publish" },
+    form: { data: { turbo_frame: "_top" } },
+    class: "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold
+            bg-gray-100 dark:bg-gray-700
+            text-gray-900 dark:text-white
+            hover:bg-gray-200 hover:text-black
+            dark:hover:bg-blue-500 dark:hover:text-white
+            transition-all duration-200" do %>
+  <svg class="w-4 h-4 stroke-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+  </svg>
+  Publish Now
+<% end %>
 
                   <button type="button" data-modal-target="deleteModal-<%= draft.id %>" data-modal-toggle="deleteModal-<%= draft.id %>"
                           class="ml-auto inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold

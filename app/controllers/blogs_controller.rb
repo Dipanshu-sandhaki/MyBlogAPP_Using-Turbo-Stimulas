@@ -6,15 +6,24 @@ class BlogsController < ApplicationController
 
   # GET /my-blogs — shows only saved + published
   def index
-    @blogs = current_user.blogs
-                         .where(status: %w[saved published])
-                         .order(created_at: :desc)
+    @page = (params[:page] || 1).to_i
+    @per_page = 5
+    
+    base_query = current_user.blogs.where(status: %w[saved published])
+    
+    @blogs = base_query.order(created_at: :desc)
+                       .limit(@per_page)
+                       .offset((@page - 1) * @per_page)
+                       
+    @has_more = base_query.count > (@page * @per_page)
+
+    @all_blog_ids = base_query.pluck(:id)
   end
 
   # GET /drafts
   def drafts
     @page = (params[:page] || 1).to_i
-    @per_page = 10
+    @per_page = 5 
     
     @drafts = current_user.blogs.draft
                           .order(updated_at: :desc)

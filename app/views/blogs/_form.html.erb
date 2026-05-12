@@ -1,13 +1,18 @@
-<div class="be-page min-h-screen py-10 px-4" data-controller="blog-editor">
+<div class="be-page min-h-screen py-10 px-4"
+     data-controller="blog-editor"
+     data-blog-editor-original-status-value="<%= blog.persisted? ? blog.status : 'new' %>">
   <div class="max-w-3xl mx-auto">
 
     <div class="mb-8">
-      <%= link_to my_blogs_path, class: "be-back-link" do %>
+      <a href="<%= my_blogs_path %>"
+         data-action="click->blog-editor#goBack"
+         data-destination="<%= my_blogs_path %>"
+         class="be-back-link">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
         Back to My Blogs
-      <% end %>
+      </a>
 
       <div class="flex items-center gap-3 mt-2">
         <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
@@ -27,7 +32,10 @@
       </div>
     </div>
 
-    <%= form_with(model: blog, local: true, html: { enctype: "multipart/form-data" }) do |f| %>
+    <%= form_with(model: blog, local: true,
+        html: { enctype: "multipart/form-data",
+                "data-blog-editor-target": "form" },
+        data: { turbo_frame: "_top" }) do |f| %>
 
       <% if blog.errors.any? %>
         <div class="be-error-box">
@@ -42,20 +50,28 @@
 
         <div class="form-field">
           <label class="be-label">Title <span class="text-indigo-400">*</span></label>
-          <%= f.text_field :title, placeholder: "Your blog title...", class: "be-input text-xl font-semibold" %>
+          <%= f.text_field :title,
+                placeholder: "Your blog title...",
+                class: "be-input text-xl font-semibold",
+                "data-action": "input->blog-editor#markDirty" %>
         </div>
 
         <div class="form-field be-card">
           <label class="be-label">Cover Image <span class="be-optional">(optional)</span></label>
           <% if blog.persisted? && blog.cover_image.attached? %>
-            <%= image_tag blog.cover_image, class: "w-full max-h-48 object-cover rounded-lg mb-3 border border-gray-200 dark:border-gray-700" %>
+            <%= image_tag blog.cover_image,
+                  class: "w-full max-h-48 object-cover rounded-lg mb-3 border border-gray-200 dark:border-gray-700" %>
           <% end %>
           <label class="cursor-pointer flex items-center gap-3 group">
             <div class="be-file-btn group-hover:bg-indigo-600 group-hover:border-indigo-500 group-hover:text-white">
               Choose file
             </div>
             <span class="be-file-label" id="file-label">No file chosen</span>
-            <%= f.file_field :cover_image, accept: "image/*", class: "hidden", id: "cover_image_input", onchange: "previewCover(this)" %>
+            <%= f.file_field :cover_image,
+                  accept: "image/*",
+                  class: "hidden",
+                  id: "cover_image_input",
+                  onchange: "previewCover(this)" %>
           </label>
           <img id="cover-preview" class="cover-preview" alt="Cover preview" />
         </div>
@@ -147,76 +163,66 @@
 
           </trix-toolbar>
 
-          <%= f.rich_text_area :content, toolbar: "blog-toolbar", class: "trix-content" %>
+          <%= f.rich_text_area :content,
+                toolbar: "blog-toolbar",
+                class: "trix-content",
+                "data-action": "trix-change->blog-editor#markDirty" %>
         </div>
 
-        <%# ── Action buttons — Save Draft / Save / Publish / Discard ── %>
-<div class="form-field pt-2">
+        <div class="form-field pt-2">
 
-  <% if blog.persisted? %>
-    <p class="text-xs text-gray-400 dark:text-gray-500 mb-3">
-      Current status:
-      <span class="font-semibold
-        <%= blog.draft?     ? 'text-amber-500'   :
-            blog.saved?     ? 'text-emerald-500' :
-                              'text-indigo-500'  %>">
-        <%= blog.status.capitalize %>
-      </span>
-    </p>
-  <% end %>
+          <% if blog.persisted? %>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mb-3">
+              Current status:
+              <span class="font-semibold
+                <%= blog.draft?     ? 'text-amber-500'   :
+                    blog.saved?     ? 'text-emerald-500' :
+                                      'text-indigo-500'  %>">
+                <%= blog.status.capitalize %>
+              </span>
+            </p>
+          <% end %>
 
-  <!-- ✅ SINGLE CLEAN WRAPPER -->
-  <div class="flex items-center justify-between
-              pt-5 mt-6 border-t border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between pt-5 mt-6 border-t border-gray-200 dark:border-gray-700">
 
-    <%# LEFT: Discard %>
-    <%= link_to (blog.new_record? ? my_blogs_path : :back),
-        data: { turbo_confirm: "Discard all changes and leave?" },
-        class: "inline-flex items-center gap-2 h-10 px-5 rounded-xl
-                bg-red-600 hover:bg-red-700
-                text-white text-sm font-semibold
-                transition-all duration-150" do %>
-      Discard
-    <% end %>
+            <button type="button"
+                    data-action="click->blog-editor#discard"
+                    data-destination="<%= my_blogs_path %>"
+                    class="inline-flex items-center gap-2 h-10 px-5 rounded-xl
+                           bg-red-600 hover:bg-red-700
+                           text-white text-sm font-semibold
+                           transition-all duration-150">
+              Discard
+            </button>
 
-    <%# RIGHT: Actions %>
-    <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3">
 
-      <%# Save Draft %>
-      <%= f.submit "Save Draft",
-          name: "commit",
-          class: "inline-flex items-center justify-center px-4 h-10 rounded-xl
-                  text-sm font-medium
-                  bg-gray-100 dark:bg-gray-700
-                  text-gray-700 dark:text-gray-300
-                  hover:bg-gray-200 dark:hover:bg-gray-600
-                  border border-gray-300 dark:border-gray-600
-                  transition" %>
+              <span data-blog-editor-target="saveStatus"
+                    class="text-xs text-gray-400 dark:text-gray-500 hidden transition-all duration-300">
+              </span>
 
-      <%# Save %>
-      <%= f.submit "Save",
-          name: "commit",
-          class: "inline-flex items-center justify-center px-4 h-10 rounded-xl
-                  text-sm font-medium
-                  bg-gray-200 dark:bg-gray-600
-                  text-gray-800 dark:text-gray-200
-                  hover:bg-gray-300 dark:hover:bg-gray-500
-                  transition" %>
+              <%= f.submit "Save",
+                  name: "commit",
+                  class: "inline-flex items-center justify-center px-4 h-10 rounded-xl
+                          text-sm font-medium cursor-pointer
+                          bg-gray-200 dark:bg-gray-600
+                          text-gray-800 dark:text-gray-200
+                          hover:bg-gray-300 dark:hover:bg-gray-500
+                          transition" %>
 
-      <%# Publish %>
-      <%= f.submit "Publish",
-          name: "commit",
-          class: "inline-flex items-center justify-center px-5 h-10 rounded-xl
-                  text-sm font-semibold
-                  text-white
-                  bg-indigo-600 hover:bg-indigo-500
-                  dark:bg-indigo-500 dark:hover:bg-indigo-400
-                  shadow-md
-                  transition-all duration-150" %>
+              <%= f.submit "Publish",
+                  name: "commit",
+                  class: "inline-flex items-center justify-center px-5 h-10 rounded-xl
+                          text-sm font-semibold cursor-pointer
+                          text-white
+                          bg-indigo-600 hover:bg-indigo-500
+                          dark:bg-indigo-500 dark:hover:bg-indigo-400
+                          shadow-md
+                          transition-all duration-150" %>
 
-    </div>
-  </div>
-</div>
+            </div>
+          </div>
+        </div>
 
       </div>
     <% end %>

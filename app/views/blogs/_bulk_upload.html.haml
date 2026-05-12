@@ -1,0 +1,16 @@
+%turbo-frame#modal
+  / HEADER
+  .bg-gray-900.text-white.px-5.py-4.flex.justify-between.items-center
+    %h2.text-lg.font-semibold.uppercase.text-gray-300
+      Bulk Upload Blogs
+    %button.text-gray-400.hover:text-red-400.text-xl.font-bold{"data-action" => "click->modal#close", type: "button"}
+      ×
+  / BODY
+  .bg-white.dark:bg-gray-900.p-6.space-y-4
+    = form_with url: bulk_create_blogs_path, |
+      method: :post,                         |
+      html: { multipart: true },             |
+      data: { turbo: false } do |f|          |
+      %input.w-full.border.border-gray-300.dark:border-gray-700.bg-white.dark:bg-gray-800.text-gray-900.dark:text-white.rounded-lg.p-2.mb-4{accept: ".csv", name: "file", type: "file"}/
+      %button.w-full.bg-blue-600.text-white.py-2.rounded-lg.hover:bg-blue-700.transition{type: "submit"}
+        Upload

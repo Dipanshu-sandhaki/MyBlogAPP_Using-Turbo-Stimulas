@@ -1,0 +1,6 @@
+/ COMMENT FORM
+%div{id: "comment_form_#{blog.id}"}
+  = render "comments/form", blog: blog, comment: Comment.new
+/ COMMENT LIST
+.mt-3.space-y-2{id: "comment_list_#{blog.id}"}
+  = render blog.comments.order(created_at: :desc), blog: blog, current_user: current_user
