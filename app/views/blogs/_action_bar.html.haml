@@ -1,14 +1,14 @@
 #action_bar.mb-6
   - if blogs.empty?
     .flex.justify-center.gap-4.mt-6
-      = link_to new_blog_path,                                                                                                                                                                        |
-        class: "inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all" do |
+      = link_to new_blog_path,
+        class: "inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all" do
         %svg.w-4.h-4{fill: "none", stroke: "currentColor", viewbox: "0 0 24 24"}
           %path{d: "M12 4v16m8-8H4", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2.5"}
         Create Blog
-      = link_to bulk_upload_blogs_path,                                                                                                                                                                                                                              |
-        data: { turbo_frame: "modal" },                                                                                                                                                                                                                              |
-        class: "inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all" do |
+      = link_to bulk_upload_blogs_path,
+        data: { turbo_frame: "modal" },
+        class: "inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all" do
         %svg.w-4.h-4{fill: "none", stroke: "currentColor", viewbox: "0 0 24 24"}
           %path{d: "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2.5"}
         Bulk Upload
@@ -24,14 +24,14 @@
           Delete Selected
           %span.ml-1.px-2.bg-red-100.dark:bg-gray-900.text-red-700.dark:text-red-500.rounded-md.text-xs.font-extrabold.hidden{class: "py-0.5", "data-bulk-select-target" => "count"}
             0
-        = link_to new_blog_path,                                                                                                                                                                        |
-          class: "inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition-all" do |
+        = link_to new_blog_path,
+          class: "inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition-all" do
           %svg.w-4.h-4{fill: "none", stroke: "currentColor", viewbox: "0 0 24 24"}
             %path{d: "M12 4v16m8-8H4", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2.5"}
           Create
-        = link_to bulk_upload_blogs_path,                                                                                                                                                                                  |
-          data: { turbo_frame: "modal" },                                                                                                                                                                                  |
-          class: "inline-flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition-all" do |
+        = link_to bulk_upload_blogs_path,
+          data: { turbo_frame: "modal" },
+          class: "inline-flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition-all" do
           %svg.w-4.h-4{fill: "none", stroke: "currentColor", viewbox: "0 0 24 24"}
             %path{d: "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2.5"}
           Upload

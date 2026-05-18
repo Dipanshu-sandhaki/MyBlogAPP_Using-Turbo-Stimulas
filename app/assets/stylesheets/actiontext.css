@@ -93,17 +93,14 @@
   border-radius: 8px;
 }
 
-/* Custom font sizes (set via blog editor) */
 .trix-content [style*="font-size"] {
   display: inline;
 }
 
-/* Custom text colors (set via blog editor) */
 .trix-content [style*="color"] {
   display: inline;
 }
 
-/* Preserve inline styles from Trix editor (color, font-size) */
 .trix-content span[style] {
   display: inline;
 }

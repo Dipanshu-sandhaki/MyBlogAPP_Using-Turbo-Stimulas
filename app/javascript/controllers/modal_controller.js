@@ -22,7 +22,11 @@ export default class extends Controller {
   }
 
   handleFrameLoad(event) {
-    if (event.target.id === "modal") {
+    if (
+      event.target.id === "modal" &&
+      this.hasModalTarget &&
+      event.target.innerHTML.trim() !== ""
+    ) {
       this.open()
     }
   }
@@ -31,46 +35,39 @@ export default class extends Controller {
     this._unlockScroll()
   }
 
+  handleKeydown(event) {
+    if (event.key === "Escape") {
+      if (this.hasModalTarget && !this.modalTarget.classList.contains("hidden")) {
+        this.close()
+      }
+      if (this.hasDeleteModalTarget && !this.deleteModalTarget.classList.contains("hidden")) {
+        this.closeDelete()
+      }
+    }
+  }
+
   open() {
-    this.modalTarget.classList.remove("hidden")
-    this._lockScroll()
+    if (this.hasModalTarget) {
+      this.modalTarget.classList.remove("hidden")
+      this._lockScroll()
+    }
   }
 
   close() {
-    this.modalTarget.classList.add("hidden")
-    const frame = this.modalTarget.querySelector("turbo-frame#modal")
-    if (frame) frame.innerHTML = ""
+    if (this.hasModalTarget) {
+      this.modalTarget.classList.add("hidden")
+      const frame = this.modalTarget.querySelector("turbo-frame#modal")
+      if (frame) frame.innerHTML = ""
+    }
     this._unlockScroll()
-  }
-
-  backdropClose(event) {
-    if (event.target === this.modalTarget) {
-      this.close()
-    }
-    if (event.target === this.deleteModalTarget) {
-      this.closeDelete()
-    }
-  }
-
-  handleKeydown(event) {
-    if (event.key === "Escape") {
-      this.close()
-      this.closeDelete()
-    }
-  }
-
-  submitEnd(event) {
-    if (event.detail.success) {
-      this.close()
-    }
   }
 
   openDelete(event) {
     this.deleteUrl = event.currentTarget.dataset.url
     if (this.hasDeleteModalTarget) {
       this.deleteModalTarget.classList.remove("hidden")
+      this._lockScroll()
     }
-    this._lockScroll()
   }
 
   closeDelete() {
@@ -84,17 +81,27 @@ export default class extends Controller {
   confirmDelete() {
     if (!this.deleteUrl) return
 
-    fetch(this.deleteUrl, {
+    const url = this.deleteUrl
+    this.closeDelete()
+
+    fetch(url, {
       method: "DELETE",
       headers: {
         "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-        "Accept": "text/vnd.turbo-stream.html"
+        "Accept": "text/vnd.turbo-stream.html, text/html, application/xhtml+xml"
       }
-    }).then((response) => {
+    })
+    .then(async (response) => {
       if (response.ok) {
-        this.closeDelete()
-        window.location.reload()
+        const contentType = response.headers.get("content-type") || ""
+        if (contentType.includes("turbo-stream")) {
+          const html = await response.text()
+          Turbo.renderStreamMessage(html)
+        }
       }
+    })
+    .catch((err) => {
+      console.error("Delete failed:", err)
     })
   }
 

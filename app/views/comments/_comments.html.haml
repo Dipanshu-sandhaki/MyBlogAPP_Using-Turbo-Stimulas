@@ -3,4 +3,6 @@
   = render "comments/form", blog: blog, comment: Comment.new
 / COMMENT LIST
 .mt-3.space-y-2{id: "comment_list_#{blog.id}"}
-  = render blog.comments.order(created_at: :desc), blog: blog, current_user: current_user
+  - limit = local_assigns.fetch(:limit, nil)
+  - comments = limit ? blog.comments.order(created_at: :desc).limit(limit) : blog.comments.order(created_at: :desc)
+  = render comments, blog: blog, current_user: current_user

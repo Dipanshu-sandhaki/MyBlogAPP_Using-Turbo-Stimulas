@@ -1,153 +1,60 @@
-%turbo-frame#modal
-  #blog-modal-container.relative.bg-white.dark:bg-gray-900.rounded-3xl.overflow-hidden.flex.flex-col.shadow-2xl
-    .sticky.top-0.z-20.flex.justify-between.items-center.px-6.py-4.backdrop-blur-md.border-b.border-gray-200.dark:border-gray-800{class: "bg-white/95 dark:bg-gray-900/95"}
-      .flex.items-center.gap-3
-        %span{class: "#{@blog.published? ? 'badge-published' : 'badge-draft'} px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-md"}
-          = @blog.status
-        %span.text-sm.font-medium.text-gray-500.dark:text-gray-400
-          = time_ago_in_words(@blog.created_at)
-          ago
-      %button.p-2.rounded-full.bg-gray-100.dark:bg-gray-800.text-gray-500.dark:text-gray-400.hover:bg-red-100.hover:text-red-600.dark:hover:text-red-400.transition-colors{class: "dark:hover:bg-red-900/30", onclick: "closeBlogModal()", type: "button"}
-        %svg.w-5.h-5{fill: "none", stroke: "currentColor", viewbox: "0 0 24 24"}
-          %path{d: "M6 18L18 6M6 6l12 12", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2.5"}
-    .p-6.sm:p-8.relative
-      - if @blog.cover_image.attached?
-        = image_tag @blog.cover_image, class: "w-full h-64 sm:h-80 object-cover rounded-2xl mb-8 shadow-sm border border-gray-100 dark:border-gray-800"
-      %h1.text-3xl.sm:text-4xl.font-extrabold.text-gray-900.dark:text-white.mb-6.leading-tight.break-words
-        = @blog.title
-      #blog-content-wrapper.relative.overflow-hidden.transition-all.duration-500.ease-in-out{class: "max-h-[150px]"}
-        #blog-inner-content.trix-content.text-justify.pb-4.break-words
-          = raw @blog.content&.body&.to_html
-        #blog-content-fader.absolute.bottom-0.left-0.right-0.h-20.bg-gradient-to-t.from-white.dark:from-gray-900.to-transparent.pointer-events-none.transition-opacity.duration-300
-      #see-more-container.mt-8.flex.justify-center.hidden
-        %button#blog-read-more-btn.inline-flex.items-center.gap-2.px-6.rounded-full.text-sm.font-bold.bg-gray-100.dark:bg-gray-800.text-gray-900.dark:text-white.border.border-gray-200.dark:border-gray-700.hover:bg-gray-200.dark:hover:bg-gray-700.transition-all.shadow-sm.group{class: "py-2.5", onclick: "toggleReadMore()"}
-          %span See More
-          %svg#read-more-icon.w-4.h-4.transition-transform.duration-300{class: "group-hover:translate-y-0.5", fill: "none", stroke: "currentColor", viewbox: "0 0 24 24"}
-            %path{d: "M19 9l-7 7-7-7", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2.5"}
-  :css
-    #blog-inner-content {
-      color: #111827; 
-      font-size: 1rem;
-      line-height: 1.75;
-    }
-    
-    .dark #blog-inner-content {
-      color: #e5e7eb; 
-    }
-    
-    @media (min-width: 640px) {
-      #blog-inner-content {
-        font-size: 1.125rem; 
-      }
-    }
+= turbo_frame_tag "modal" do
+  / Close button
+  .flex.justify-end.px-4.pt-4
+    %button.p-1.5.rounded-lg.text-gray-400.hover:text-gray-700.dark:hover:text-white.hover:bg-gray-100.dark:hover:bg-gray-700.transition{"data-action" => "click->modal#close", type: "button"}
+      %svg.w-5.h-5{fill: "none", stroke: "currentColor", "stroke-width" => "2.5", viewbox: "0 0 24 24"}
+        %path{d: "M6 18L18 6M6 6l12 12", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
 
-    #blog-inner-content div,
-    #blog-inner-content p,
-    #blog-inner-content span,
-    #blog-inner-content li {
-      font-size: inherit;
-      color: inherit;
-      line-height: inherit;
-    }
+  .px-6.pb-6
 
-    #blog-inner-content h1 {
-      font-size: 1.5em;
-      font-weight: bold;
-      margin-top: 1em;
-      margin-bottom: 0.5em;
-    }
+    / Cover Image
+    - if @blog.cover_image.attached?
+      = image_tag @blog.cover_image, class: "w-full h-56 object-cover rounded-xl mb-6 border border-gray-100 dark:border-gray-700"
 
-    #blog-inner-content a {
-      color: #4f46e5;
-      text-decoration: underline;
-    }
+    / Status badge row
+    .flex.items-center.gap-2.mb-4
+      %span{class: "#{@blog.published? ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400'} px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-md"}
+        = @blog.status
+      %span.text-xs.text-gray-400.dark:text-gray-500.font-medium
+        = time_ago_in_words(@blog.created_at)
+        ago
 
-    .dark #blog-inner-content a {
-      color: #818cf8;
-    }
-  :javascript
-    // Force hide modal and clear content
-    window.closeBlogModal = function() {
-      const globalModal = document.querySelector('[data-modal-target="modal"]');
-      if (globalModal) {
-        globalModal.classList.add('hidden');
-      }
-      document.getElementById('modal').innerHTML = '';
-    };
+    / Author row
+    .flex.items-center.gap-3.mb-5.pb-5.border-b.border-gray-100.dark:border-gray-700
+      .w-10.h-10.rounded-full.overflow-hidden.shrink-0.ring-2.ring-gray-100.dark:ring-gray-700{style: "background: linear-gradient(135deg, #3b82f6, #4f46e5);"}
+        - if @blog.user.avatar.attached?
+          = image_tag url_for(@blog.user.avatar), class: "w-full h-full object-cover"
+        - else
+          .w-full.h-full.flex.items-center.justify-center
+            %span.text-white.text-sm.font-extrabold= @blog.user.email[0].upcase
+      %div
+        %p.text-sm.font-bold.text-gray-900.dark:text-white.leading-tight
+          = @blog.user.email.split("@").first
+        %p.text-xs.text-gray-400.dark:text-gray-500.leading-tight{class: "mt-0.5"}
+          = @blog.created_at.strftime("%B %d, %Y")
 
-    // Initialize See More
-    (function() {
-      const wrapper = document.getElementById('blog-content-wrapper');
-      const innerContent = document.getElementById('blog-inner-content');
-      const container = document.getElementById('see-more-container');
-      const fader = document.getElementById('blog-content-fader');
+    / Title
+    %h1.text-2xl.sm:text-3xl.font-extrabold.text-gray-900.dark:text-white.leading-tight.break-words.mb-2
+      = @blog.title
+    .w-10.bg-blue-600.rounded-full.mb-6{class: "h-[3px]"}
 
-      if (!wrapper || !innerContent || !container) return;
+    / Full content
+    .trix-content.text-gray-700.dark:text-gray-300.leading-relaxed.break-words
+      = raw @blog.content&.body&.to_html
 
-      function checkHeight() {
-        const realHeight = innerContent.offsetHeight;
-
-        if (realHeight > 160) {
-          container.classList.remove('hidden'); 
-        } else {
-          wrapper.classList.remove('max-h-[150px]');
-          wrapper.style.maxHeight = 'none';
-          if(fader) fader.style.display = 'none';
-          container.classList.add('hidden');
-        }
-      }
-
-      const observer = new ResizeObserver((entries) => {
-        for (let entry of entries) {
-          if (entry.contentRect.height > 0) {
-            checkHeight();
-            observer.disconnect();
-          }
-        }
-      });
-
-      observer.observe(innerContent);
-      
-      // Fallback
-      setTimeout(checkHeight, 100);
-    })();
-
-    window.toggleReadMore = function() {
-      const wrapper = document.getElementById('blog-content-wrapper');
-      const innerContent = document.getElementById('blog-inner-content');
-      const fader = document.getElementById('blog-content-fader');
-      const btnText = document.querySelector('#blog-read-more-btn span');
-      const icon = document.getElementById('read-more-icon');
-
-      const realHeight = innerContent.offsetHeight;
-
-      if (wrapper.classList.contains('max-h-[150px]')) {
-        wrapper.style.maxHeight = realHeight + "px";
-        wrapper.classList.remove('max-h-[150px]');
-        if(fader) fader.style.opacity = '0';
-        if(btnText) btnText.textContent = 'See Less';
-        if(icon) {
-          icon.classList.add('rotate-180');
-          icon.classList.remove('group-hover:translate-y-0.5');
-          icon.classList.add('group-hover:-translate-y-0.5');
-        }
-
-        setTimeout(() => { wrapper.style.maxHeight = 'none'; }, 500);
-      } else {
-        wrapper.style.maxHeight = realHeight + "px";
-        void wrapper.offsetHeight; 
-
-        wrapper.classList.add('max-h-[150px]');
-        wrapper.style.maxHeight = null;
-        if(fader) fader.style.opacity = '1';
-        if(btnText) btnText.textContent = 'See More';
-        if(icon) {
-          icon.classList.remove('rotate-180');
-          icon.classList.remove('group-hover:-translate-y-0.5');
-          icon.classList.add('group-hover:translate-y-0.5');
-        }
-
-        const scrollArea = document.getElementById('global-modal-scroll');
-        if (scrollArea) scrollArea.scrollTo({top: 0, behavior: 'smooth'});
-      }
-    };
+:css
+  .trix-content {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+  }
+  @media (min-width: 640px) {
+    .trix-content { font-size: 1.125rem; }
+  }
+  .trix-content h1 { font-size: 1.5em; font-weight: 800; margin: 1em 0 0.5em; }
+  .trix-content h2 { font-size: 1.25em; font-weight: 700; margin: 1em 0 0.5em; }
+  .trix-content p  { margin-bottom: 1em; }
+  .trix-content a  { color: #4f46e5; text-decoration: underline; word-break: break-all; }
+  .dark .trix-content a { color: #818cf8; }
+  .trix-content ul { list-style: disc; padding-left: 1.5em; margin-bottom: 1em; }
+  .trix-content ol { list-style: decimal; padding-left: 1.5em; margin-bottom: 1em; }
+  .trix-content blockquote { border-left: 3px solid #4f46e5; padding-left: 1em; color: #6b7280; margin: 1em 0; }

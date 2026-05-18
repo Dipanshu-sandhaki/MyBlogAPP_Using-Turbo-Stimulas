@@ -1,4 +1,4 @@
-- remaining_blogs = current_user.blogs.order(created_at: :desc)
+- remaining_blogs = current_user.blogs.where(status: %w[saved published]).order(created_at: :desc)
 = turbo_stream.replace "blogs" do
   #blogs
     - if remaining_blogs.empty?

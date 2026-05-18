@@ -60,6 +60,10 @@ group :development do
   # gem "spring"
 
   gem "error_highlight", ">= 0.4.0", platforms: [:ruby]
+
+  #gmail reset password
+  gem "letter_opener_web"
+  
 end
 
 group :test do
@@ -74,3 +78,5 @@ gem "tailwindcss-rails"
 
 gem "image_processing", "~> 1.2"
 gem "rubocop", "~> 1.86"
+
+gem 'haml-rails'

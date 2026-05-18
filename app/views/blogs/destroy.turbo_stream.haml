@@ -1,5 +1,36 @@
-= turbo_stream.remove dom_id(@blog)
-= turbo_stream.replace "action_bar" do
-  = render "blogs/action_bar", blogs: current_user.blogs.order(created_at: :desc)
+- if @was_draft
+  - remaining_drafts = current_user.blogs.draft.order(updated_at: :desc)
+  - if remaining_drafts.empty?
+    = turbo_stream.update "drafts-section" do
+      .flex.flex-col.items-center.justify-center.py-20.text-center.bg-white.dark:bg-gray-800.rounded-3xl.border.border-gray-200.dark:border-gray-700.shadow-sm
+        .relative.mb-8
+          .w-24.h-24.rounded-3xl.bg-gray-50.dark:bg-gray-900.border-2.border-dashed.border-gray-300.dark:border-gray-600.flex.items-center.justify-center.shadow-inner
+            %svg.w-10.h-10.text-gray-800.dark:text-white.stroke-current{fill: "none", stroke: "currentColor", "stroke-width" => "1.5", viewbox: "0 0 24 24"}
+              %path{d: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+          %span.absolute.-top-1.-right-1.rounded-full.bg-blue-500.border-2.border-white.dark:border-gray-800{class: "w-3.5 h-3.5"}
+          %span.absolute.-bottom-1.-left-1.rounded-full.bg-blue-500.border-2.border-white.dark:border-gray-800{class: "w-2.5 h-2.5"}
+        %h3.text-xl.font-bold.text-gray-900.dark:text-white.mb-2 No drafts saved yet
+        %p.text-gray-500.dark:text-gray-400.max-w-sm
+          Nothing in progress yet. Start writing something!
+  - else
+    = turbo_stream.remove dom_id(@blog)
+
+- else
+  - remaining_blogs = current_user.blogs.where(status: %w[saved published]).order(created_at: :desc)
+  - if remaining_blogs.empty?
+    = turbo_stream.replace "blogs_list_target" do
+      #blogs_list_target
+        .mt-12.flex.flex-col.items-center.justify-center.py-20.text-center.bg-white.dark:bg-gray-800.rounded-3xl.border.border-gray-200.dark:border-gray-700.shadow-sm.border-dashed.transition-colors
+          .w-20.h-20.rounded-2xl.bg-blue-50.dark:bg-gray-700.text-blue-600.dark:text-blue-400.flex.items-center.justify-center.mb-6
+            %svg.w-10.h-10.stroke-current{fill: "none", "stroke-width" => "1.5", viewbox: "0 0 24 24"}
+              %path{d: "M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9zm3.75 11.625a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+          %h3.text-xl.font-bold.text-gray-900.dark:text-white.mb-2 No blogs found
+          %p.text-gray-500.dark:text-gray-400.max-w-sm
+            Your workspace is empty. Create a new blog or upload via CSV to get started.
+  - else
+    = turbo_stream.remove dom_id(@blog)
+  = turbo_stream.replace "action_bar" do
+    = render "blogs/action_bar", blogs: remaining_blogs
+
 = turbo_stream.replace "flash" do
   = render "shared/flash"

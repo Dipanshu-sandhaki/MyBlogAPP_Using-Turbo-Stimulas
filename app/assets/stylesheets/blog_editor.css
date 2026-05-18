@@ -1,6 +1,4 @@
-/* ─────────────────────────────────────────
-   PAGE WRAPPER
-───────────────────────────────────────── */
+/* PAGE WRAPPER */
 .be-page {
   background: #eef0f5;
 }
@@ -8,9 +6,7 @@
   background: #030712;
 }
 
-/* ─────────────────────────────────────────
-   BACK LINK
-───────────────────────────────────────── */
+/* BACK LINK */
 .be-back-link {
   color: #111827;
   text-decoration: none;
@@ -27,9 +23,7 @@
 .dark .be-back-link { color: #ffffff; }
 .dark .be-back-link:hover { color: #60a5fa; }
 
-/* ─────────────────────────────────────────
-   PAGE HEADING
-───────────────────────────────────────── */
+/* PAGE HEADING */
 .be-heading {
   font-size: 26px;
   font-weight: 800;
@@ -50,9 +44,7 @@
   color: #94a3b8;
 }
 
-/* ─────────────────────────────────────────
-   ERROR BOX
-───────────────────────────────────────── */
+/* ERROR BOX */
 .be-error-box {
   background: #fef2f2;
   border: 1px solid #fecaca;
@@ -84,9 +76,7 @@
 }
 .dark .be-error-msg { color: #fca5a5; }
 
-/* ─────────────────────────────────────────
-   LABELS & INPUTS
-───────────────────────────────────────── */
+/* LABELS & INPUTS */
 .be-label {
   display: block;
   font-size: 10px;
@@ -139,9 +129,7 @@
   box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.18);
 }
 
-/* ─────────────────────────────────────────
-   CARD
-───────────────────────────────────────── */
+/* CARD */
 .be-card {
   background: #ffffff;
   border: 1.5px solid #e2e8f0;
@@ -153,9 +141,7 @@
   border-color: #1e293b;
 }
 
-/* ─────────────────────────────────────────
-   FILE BUTTON & LABEL
-───────────────────────────────────────── */
+/* FILE BUTTON */
 .be-file-btn {
   flex-shrink: 0;
   background: #f1f5f9;
@@ -190,14 +176,12 @@
 }
 .dark .cover-preview { border-color: #1e293b; }
 
-/* ─────────────────────────────────────────
-   TOOLBAR
-───────────────────────────────────────── */
+/* TOOLBAR */
 .be-toolbar {
   background: #f1f5f9;
-  border: 1.5px solid #e2e8f0;
-  border-bottom: none;
-  border-radius: 12px 12px 0 0;
+  border: none;
+  border-bottom: 1px solid #e2e8f0;
+  border-radius: 0;
   padding: 8px 12px;
   display: flex;
   flex-wrap: wrap;
@@ -206,7 +190,7 @@
 }
 .dark .be-toolbar {
   background: #0c1322;
-  border-color: #1e293b;
+  border-bottom: 1px solid #1e293b;
 }
 
 .be-group {
@@ -276,9 +260,7 @@
 .be-btn--color { width: 32px; overflow: visible; }
 .be-color-input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 
-/* ─────────────────────────────────────────
-   LINK DIALOG
-───────────────────────────────────────── */
+/* LINK DIALOG */
 .be-link-dialog {
   background: #f8fafc;
   border: 1.5px solid #e2e8f0;
@@ -337,9 +319,7 @@
 .dark .be-link-btn--remove { background: #1f2937; color: #f87171; border-color: #374151; }
 .dark .be-link-btn--remove:hover { background: #7f1d1d; color: #fca5a5; border-color: #7f1d1d; }
 
-/* ─────────────────────────────────────────
-   DISCARD BUTTON — UPPERCASE
-───────────────────────────────────────── */
+/* DISCARD BUTTON  */
 .be-discard-btn {
   padding: 12px 24px;
   border-radius: 12px;
@@ -364,22 +344,11 @@
 .dark .be-discard-btn { background: #dc2626; color: #ffffff; }
 .dark .be-discard-btn:hover { background: #b91c1c; }
 
-/* Inline discard button (the one in the form action bar) */
-button[data-action*="discard"] {
-  font-weight: 800 !important;
-  letter-spacing: 0.06em !important;
-  text-transform: uppercase !important;
-  font-size: 12px !important;
-}
-
-/* ─────────────────────────────────────────
-   TRIX EDITOR BODY
-───────────────────────────────────────── */
+/* TRIX EDITOR BODY */
 trix-editor {
   background: #ffffff !important;
-  border: 1.5px solid #e2e8f0 !important;
-  border-top: none !important;
-  border-radius: 0 0 12px 12px !important;
+  border: none !important;
+  border-radius: 0 !important;
   color: #0f172a;
   font-size: 15px;
   line-height: 1.85 !important;
@@ -389,10 +358,26 @@ trix-editor {
   caret-color: #6366f1 !important;
   font-family: Georgia, 'Times New Roman', serif !important;
 }
-trix-editor:focus {
-  border-color: #6366f1 !important;
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.18) !important;
+
+.be-editor-wrapper {
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
+.dark .be-editor-wrapper {
+  border-color: #1e293b;
+}
+
+.be-editor-wrapper:focus-within {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18) !important;
+}
+.dark .be-editor-wrapper:focus-within {
+  border-color: #818cf8 !important;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.18) !important;
+}
+
 .dark trix-editor {
   background: #080d1a !important;
   border-color: #1e293b !important;
@@ -459,9 +444,7 @@ trix-editor a      { color: #4338ca; text-decoration: underline !important; font
 trix-editor strong { font-weight: 900 !important; color: #0f172a; }
 .dark trix-editor strong { color: #f1f5f9; }
 
-/* ─────────────────────────────────────────
-   SLIDE-UP ANIMATION
-───────────────────────────────────────── */
+/* SLIDE-UP ANIMATION */
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -472,9 +455,7 @@ trix-editor strong { font-weight: 900 !important; color: #0f172a; }
 .form-field:nth-child(3) { animation-delay: 0.20s; }
 .form-field:nth-child(4) { animation-delay: 0.28s; }
 
-/* ─────────────────────────────────────────
-   TRIX CONTENT (rendered view)
-───────────────────────────────────────── */
+/* TRIX CONTENT */
 .trix-content .attachment-gallery > action-text-attachment,
 .trix-content .attachment-gallery > .attachment {
   flex: 1 0 33%;

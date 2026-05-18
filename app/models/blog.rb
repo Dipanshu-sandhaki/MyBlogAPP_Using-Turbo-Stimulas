@@ -10,7 +10,6 @@ class Blog < ApplicationRecord
 
   enum :status, { draft: "draft", saved: "saved", published: "published" }, default: "draft"
 
-  # Title & content only required when saving or publishing — not for drafts
   validates :title, presence: true, unless: :draft?
   validates :content, presence: true, unless: :draft?
 end

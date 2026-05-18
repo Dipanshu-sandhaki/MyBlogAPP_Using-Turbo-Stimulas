@@ -2,34 +2,62 @@ require "csv"
 
 class BlogsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_blog, only: %i[edit update destroy]
+  before_action :set_blog,     only: %i[show edit update destroy]
+  before_action :set_any_blog, only: %i[read]
 
-  # GET /my-blogs — shows only saved + published
+  # GET /my-blogs
   def index
-    @page = (params[:page] || 1).to_i
+    @page     = (params[:page] || 1).to_i
     @per_page = 5
-    
-    base_query = current_user.blogs.where(status: %w[saved published])
-    
-    @blogs = base_query.order(created_at: :desc)
-                       .limit(@per_page)
-                       .offset((@page - 1) * @per_page)
-                       
-    @has_more = base_query.count > (@page * @per_page)
 
+    base_query = current_user.blogs.where(status: %w[saved published])
+
+    @blogs    = base_query.order(created_at: :desc)
+                          .limit(@per_page)
+                          .offset((@page - 1) * @per_page)
+
+    @has_more    = base_query.count > (@page * @per_page)
     @all_blog_ids = base_query.pluck(:id)
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream do
+        load_more_html = if @has_more
+          next_page = @page + 1
+          %(<turbo-frame id="load_more_button">
+            <div class="mt-8 flex justify-center pb-4">
+              <a href="#{my_blogs_path(page: next_page)}"
+                 data-turbo-stream="true"
+                 class="inline-flex items-center gap-2 px-8 py-3 rounded-full text-sm font-bold tracking-wide bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-400 dark:hover:text-blue-400 shadow-sm hover:shadow-md transition-all duration-200 group">
+                <svg class="w-4 h-4 stroke-current group-hover:animate-bounce" fill="none" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Load More
+              </a>
+            </div>
+          </turbo-frame>)
+        else
+          %(<div id="load_more_button"></div>)
+        end
+
+        render turbo_stream: [
+          turbo_stream.append("blogs_list_target", partial: "blogs/blog", collection: @blogs),
+          turbo_stream.replace("load_more_button", load_more_html)
+        ]
+      end
+    end
   end
 
   # GET /drafts
   def drafts
-    @page = (params[:page] || 1).to_i
-    @per_page = 5 
-    
-    @drafts = current_user.blogs.draft
-                          .order(updated_at: :desc)
-                          .limit(@per_page)
-                          .offset((@page - 1) * @per_page)
-                          
+    @page     = (params[:page] || 1).to_i
+    @per_page = 5
+
+    @drafts   = current_user.blogs.draft
+                             .order(updated_at: :desc)
+                             .limit(@per_page)
+                             .offset((@page - 1) * @per_page)
+
     @has_more = current_user.blogs.draft.count > (@page * @per_page)
   end
 
@@ -37,15 +65,30 @@ class BlogsController < ApplicationController
     @blog = current_user.blogs.build
   end
 
+  def show
+  end
+
+  def read
+    @comments = @blog.comments.order(created_at: :desc)
+  end
+
   def edit
   end
 
-  def show
-    @blog = current_user.blogs.find(params[:id])
-  end
-
   def create
-    @blog        = current_user.blogs.build(blog_params)
+    @blog = current_user.blogs.build(blog_params)
+
+    if ["Discard", "Back"].include?(params[:commit])
+      if blog_content_empty?
+        redirect_to my_blogs_path, notice: "Discarded empty blog."
+      else
+        @blog.status = "draft"
+        @blog.save(validate: false)
+        redirect_to drafts_path, notice: "Your progress was saved to Drafts."
+      end
+      return
+    end
+
     @blog.status = resolve_status
 
     respond_to do |format|
@@ -60,6 +103,21 @@ class BlogsController < ApplicationController
   end
 
   def update
+    if ["Discard", "Back"].include?(params[:commit])
+      if blog_content_empty?
+        redirect_to my_blogs_path, notice: "Discarded empty changes."
+      else
+        if @blog.published? || @blog.saved?
+          redirect_to my_blogs_path, notice: "Changes discarded."
+        else
+          @blog.status = "draft"
+          @blog.update(blog_params)
+          redirect_to drafts_path, notice: "Your progress was saved to Drafts."
+        end
+      end
+      return
+    end
+
     @blog.status = resolve_status
 
     if @blog.update(blog_params)
@@ -75,7 +133,7 @@ class BlogsController < ApplicationController
 
   def bulk_create
     if params[:file].blank?
-      redirect_to blogs_path, alert: "Please upload a CSV file" and return
+      redirect_to my_blogs_path, alert: "Please upload a CSV file" and return
     end
 
     file = params[:file]
@@ -83,16 +141,16 @@ class BlogsController < ApplicationController
     skipped_count = 0
 
     unless File.extname(file.original_filename).downcase == ".csv"
-      redirect_to blogs_path, alert: "Only CSV files are allowed" and return
+      redirect_to my_blogs_path, alert: "Only CSV files are allowed" and return
     end
 
     begin
       csv = CSV.read(file.path, headers: true)
       required_headers = %w[title body]
-      missing_headers = required_headers - csv.headers.map { |h| h.to_s.strip.downcase }
+      missing_headers  = required_headers - csv.headers.map { |h| h.to_s.strip.downcase }
 
       if missing_headers.any?
-        redirect_to blogs_path, alert: "CSV must include title and body columns" and return
+        redirect_to my_blogs_path, alert: "CSV must include title and body columns" and return
       end
 
       csv.each do |row|
@@ -108,42 +166,44 @@ class BlogsController < ApplicationController
         blog.content = body
         blog.status  = "saved"
         blog.save!
-
         created_count += 1
       end
 
       if created_count.positive?
-        redirect_to blogs_path, notice: "#{created_count} blogs uploaded successfully (#{skipped_count} skipped)"
+        redirect_to my_blogs_path, notice: "#{created_count} blogs uploaded successfully (#{skipped_count} skipped)"
       else
-        redirect_to blogs_path, alert: "No valid rows found in CSV"
+        redirect_to my_blogs_path, alert: "No valid rows found in CSV"
       end
     rescue => e
-      redirect_to blogs_path, alert: "CSV Upload failed: #{e.message}"
+      redirect_to my_blogs_path, alert: "CSV Upload failed: #{e.message}"
     end
   end
 
   def bulk_delete
-  ids = params[:ids]
+    ids = params[:ids]
 
-  if ids.present?
-    current_user.blogs.where(id: ids).destroy_all
-    flash.now[:notice] = "Blogs deleted successfully"
-  else
-    flash.now[:alert] = "No blogs selected"
-  end
-
-  respond_to do |format|
-    format.turbo_stream
-  end
-end
-
-
-  def destroy
-    @blog.destroy
+    if ids.present?
+      current_user.blogs.where(id: ids).destroy_all
+      flash[:notice] = "Blogs deleted successfully"
+    else
+      flash[:alert] = "No blogs selected"
+    end
 
     respond_to do |format|
+      format.json { render json: { success: true } }
       format.turbo_stream
-      format.html { redirect_back(fallback_location: my_blogs_path, notice: "Blog deleted successfully.") }
+    end
+  end
+
+  def destroy
+    @was_draft = @blog.draft?
+    @blog.destroy
+
+    notice_message = @was_draft ? "Draft deleted successfully." : "Blog deleted successfully."
+
+    respond_to do |format|
+      format.turbo_stream { flash.now[:notice] = notice_message }
+      format.html { redirect_back(fallback_location: my_blogs_path, notice: notice_message) }
     end
   end
 
@@ -153,29 +213,42 @@ end
     @blog = current_user.blogs.find(params[:id])
   end
 
+  # Used for read action — anyone can read any blog
+  def set_any_blog
+    @blog = Blog.find(params[:id])
+  end
+
   def blog_params
     params.require(:blog).permit(:title, :content, :cover_image, :status)
   end
 
-  # Reads which submit button was pressed and returns the correct status string
+  def blog_content_empty?
+    title        = blog_params[:title].to_s.strip
+    content_text = blog_params[:content].to_s.gsub(/<[^>]*>/, "").gsub("&nbsp;", "").strip
+    title.blank? && content_text.blank?
+  end
+
   def resolve_status
     case params[:commit]
-    when "Publish"    then "published"
-    when "Save"       then "saved"
-    when "Save Draft" then "draft"
-    else "draft"
+    when "Publish"
+      "published"
+    when "Save"
+      @blog.published? ? "published" : "saved"
+    else
+      @blog.status || "draft"
     end
   end
 
-  # Redirects to the right page with the right message after create/update
   def redirect_after_save
-    case @blog.status
-    when "published"
-      redirect_to root_path,     notice: "Blog published to feed! 🎉"
-    when "saved"
-      redirect_to my_blogs_path, notice: "Blog saved to My Blogs."
-    when "draft"
-      redirect_to drafts_path,   notice: "Draft saved successfully."
+    case params[:commit]
+    when "Publish"
+      redirect_to root_path, notice: "Blog published to feed! 🎉"
+    when "Save"
+      redirect_to my_blogs_path, notice: "Blog saved successfully."
+    when "Update Blog"
+      redirect_to my_blogs_path, notice: "Blog updated successfully! ✓"
+    else
+      @blog.draft? ? redirect_to(drafts_path, notice: "Draft saved successfully.") : redirect_to(my_blogs_path, notice: "Blog updated successfully! ✓")
     end
   end
 end

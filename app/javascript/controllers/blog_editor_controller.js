@@ -6,7 +6,6 @@ export default class extends Controller {
 
   connect() {
     this._isDirty    = false
-    this._isSaving   = false
     this._savedRange = null
 
     this._setupTrixAttributes()
@@ -37,73 +36,34 @@ export default class extends Controller {
     this._isDirty = true
   }
 
-  async goBack(event) {
-    event.preventDefault()
-    const destination = event.currentTarget.dataset.destination || "/"
-
-    if (this.originalStatusValue === "published" || this.originalStatusValue === "saved") {
-      window.location.href = destination
-      return
-    }
-
-    await this._autoSaveAndLeave(destination)
+  clearDirty() {
+    this._isDirty = false
   }
 
-  async discard(event) {
+  goBack(event) {
     event.preventDefault()
-    const destination = event.currentTarget.dataset.destination || "/"
-
-    if (this.originalStatusValue === "published" || this.originalStatusValue === "saved") {
-      window.location.href = destination
-      return
-    }
-
-    const title = this.formTarget?.querySelector("input[name*='title']")?.value?.trim()
-    if (!title && !this._isDirty) {
-      window.location.href = destination
-      return
-    }
-
-    await this._autoSaveAndLeave(destination)
+    this._isDirty = false
+    this._submitWithCommit("Discard")
   }
 
-  async _autoSaveAndLeave(destination) {
-    if (this._isSaving) return
-    this._isSaving = true
+  discard(event) {
+    event.preventDefault()
+    this._isDirty = false
+    this._submitWithCommit("Discard")
+  }
 
-    this._showStatus("Saving draft…", "saving")
+  _submitWithCommit(commitValue) {
+    const form = this.formTarget
+    if (!form) return
 
-    try {
-      const form     = this.formTarget
-      const formData = new FormData(form)
+    form.querySelectorAll('input[type="hidden"][name="commit"]').forEach(el => el.remove())
 
-      formData.set("commit", "Save Draft")
-
-      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
-      const headers   = csrfToken ? { "X-CSRF-Token": csrfToken } : {}
-
-      const methodField = formData.get("_method")
-      const fetchMethod = methodField ? "POST" : form.method.toUpperCase() || "POST"
-
-      const res = await fetch(form.action, {
-        method:  fetchMethod,
-        body:    formData,
-        headers: { ...headers, "Accept": "text/html, application/json" }
-      })
-
-      if (res.ok) {
-        this._isDirty  = false
-        this._isSaving = false
-        this._showStatus("Saved to drafts ✓", "saved")
-        setTimeout(() => { window.location.href = destination }, 600)
-      } else {
-        throw new Error("Save failed")
-      }
-    } catch (err) {
-      this._isSaving = false
-      this._showStatus("Could not save — leaving anyway", "error")
-      setTimeout(() => { window.location.href = destination }, 1200)
-    }
+    const input  = document.createElement("input")
+    input.type   = "hidden"
+    input.name   = "commit"
+    input.value  = commitValue
+    form.appendChild(input)
+    form.submit()
   }
 
   _showStatus(message, state) {
