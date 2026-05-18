@@ -1,5 +1,6 @@
 = turbo_stream.remove dom_id(@comment)
 
+/ COUNT UPDATES
 = turbo_stream.replace "comment_count_#{@blog.id}" do
   = turbo_frame_tag "comment_count_#{@blog.id}" do
     .flex.items-center.gap-2.text-sm.font-semibold.text-gray-500.dark:text-gray-400

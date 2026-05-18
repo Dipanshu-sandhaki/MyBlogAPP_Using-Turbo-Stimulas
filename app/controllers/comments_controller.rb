@@ -6,6 +6,14 @@ class CommentsController < ApplicationController
     @comment = @blog.comments.build(comment_params)
     @comment.user = current_user
 
+    if @comment.parent_id.present?
+      clicked_comment = @blog.comments.find_by(id: @comment.parent_id)
+      
+      @replied_form_id = clicked_comment&.id 
+      
+      @comment.parent_id = clicked_comment&.parent_id || clicked_comment&.id
+    end
+
     respond_to do |format|
       if @comment.save
         format.turbo_stream
@@ -21,20 +29,19 @@ class CommentsController < ApplicationController
     end
   end
 
-  # Edit action
   def update
-  @comment = current_user.comments.find(params[:id])
-  @blog = @comment.blog
+    @comment = current_user.comments.find(params[:id])
+    @blog = @comment.blog
 
-  respond_to do |format|
-    if @comment.update(comment_params)
-      format.turbo_stream
-      format.html { redirect_to @blog }
-    else
-      format.html { redirect_to @blog }
+    respond_to do |format|
+      if @comment.update(comment_params)
+        format.turbo_stream
+        format.html { redirect_to @blog }
+      else
+        format.html { redirect_to @blog }
+      end
     end
   end
-end
 
   def destroy
     @comment = current_user.comments.find(params[:id])
@@ -48,6 +55,6 @@ end
   private
 
   def comment_params
-    params.require(:comment).permit(:body)
+    params.require(:comment).permit(:body, :parent_id)
   end
 end

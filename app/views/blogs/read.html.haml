@@ -77,8 +77,12 @@
         %div{id: "comment_form_#{@blog.id}"}
           = render "comments/form", blog: @blog, comment: Comment.new
 
+        / FIX: Only render top-level comments here.
+        / Replies are already rendered inside each comment via _comment.html.haml.
+        / Rendering all @comments caused replies to appear twice:
+        /   once here (as top-level) AND once nested inside their parent comment.
         .mt-4.space-y-3{id: "comment_list_#{@blog.id}"}
-          - @comments.each do |comment|
+          - @comments.select { |c| c.parent_id.nil? }.each do |comment|
             = render "comments/comment", comment: comment, blog: @blog, current_user: current_user
 
     / sidebar

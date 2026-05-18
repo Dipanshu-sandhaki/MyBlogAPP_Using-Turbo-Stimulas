@@ -1,8 +1,9 @@
 / COMMENT FORM
 %div{id: "comment_form_#{blog.id}"}
   = render "comments/form", blog: blog, comment: Comment.new
-/ COMMENT LIST
+
+/ COMMENT LIST 
 .mt-3.space-y-2{id: "comment_list_#{blog.id}"}
   - limit = local_assigns.fetch(:limit, nil)
-  - comments = limit ? blog.comments.order(created_at: :desc).limit(limit) : blog.comments.order(created_at: :desc)
+  - comments = limit ? blog.comments.root_comments.order(created_at: :desc).limit(limit) : blog.comments.root_comments.order(created_at: :desc)
   = render comments, blog: blog, current_user: current_user
