@@ -207,6 +207,20 @@ class BlogsController < ApplicationController
     end
   end
 
+  def share_email
+  @blog = Blog.find(params[:id])
+  recipient_email = params[:recipient_email].to_s.strip
+
+  if recipient_email.match?(/\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i)
+    ArticleMailer.send_article_notification(recipient_email, @blog).deliver_now
+    flash[:notice] = "Article sent to #{recipient_email} successfully!"
+  else
+    flash[:alert] = "Please enter a valid email address."
+  end
+
+  redirect_to read_blog_path(@blog)
+end
+
   private
 
   def set_blog

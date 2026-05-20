@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
   devise_for :users, controllers: {
     registrations: "users/registrations"
   }
@@ -19,7 +19,8 @@ Rails.application.routes.draw do
     end
 
     member do
-      get :read
+      get  :read
+      post :share_email
     end
 
     resources :likes,    only: [:create, :destroy]

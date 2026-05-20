@@ -564,3 +564,35 @@ trix-editor strong { font-weight: 900 !important; color: #0f172a; }
 .trix-content [style*="font-size"] { display: inline; }
 .trix-content [style*="color"] { display: inline; }
 .trix-content span[style] { display: inline; }
+
+trix-editor {
+  max-height: 380px !important;
+  overflow-y: auto !important;
+}
+
+trix-editor::-webkit-scrollbar {
+  width: 6px;
+}
+trix-editor::-webkit-scrollbar-track {
+  background: transparent;
+}
+trix-editor::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.35);
+  border-radius: 99px;
+  transition: background 0.2s;
+}
+trix-editor::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.65);
+}
+
+.dark trix-editor::-webkit-scrollbar-thumb {
+  background: rgba(129, 140, 248, 0.30);
+}
+.dark trix-editor::-webkit-scrollbar-thumb:hover {
+  background: rgba(129, 140, 248, 0.60);
+}
+
+trix-editor {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.35) transparent;
+}

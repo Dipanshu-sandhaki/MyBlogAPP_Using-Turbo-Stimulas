@@ -80,3 +80,5 @@ gem "image_processing", "~> 1.2"
 gem "rubocop", "~> 1.86"
 
 gem 'haml-rails'
+
+gem "cancancan"

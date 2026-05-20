@@ -1,2 +1,6 @@
 = turbo_stream.replace "like_button_blog_#{@blog.id}" do
   = render partial: "likes/like_button", locals: { blog: @blog, current_user: current_user }
+
+= turbo_stream.replace "sidebar_likes_count_#{@blog.id}" do
+  %span.text-xs.font-bold.text-gray-900.dark:text-white{id: "sidebar_likes_count_#{@blog.id}"}
+    = @blog.likes.count
