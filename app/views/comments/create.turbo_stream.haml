@@ -1,6 +1,5 @@
 - if @comment.parent_id.present?
-  / REPLY APPEND (Root container mein add karo)
-  = turbo_stream.append "replies_#{@comment.parent_id}" do
+  = turbo_stream.prepend "replies_#{@comment.parent_id}" do
     = render "comments/comment", comment: @comment, blog: @blog, current_user: current_user
 
   = turbo_stream.replace "reply_form_#{@replied_form_id}" do
@@ -13,7 +12,7 @@
             %span.text-white.text-xs.font-bold= current_user.email[0].upcase
         = form_with url: blog_comments_path(@blog), scope: :comment, data: { turbo_stream: true }, class: "flex-1 flex gap-2" do |f|
           = f.hidden_field :parent_id, value: @replied_form_id
-          = f.text_field :body, placeholder: "Write a reply...", class: "flex-1 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 rounded-full px-4 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          = f.text_field :body, value: "", placeholder: "Write a reply...", class: "flex-1 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 rounded-full px-4 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           = f.submit "Reply", class: "bg-blue-600 text-white text-sm px-4 py-1.5 rounded-full hover:bg-blue-700 transition cursor-pointer"
 
 - else
