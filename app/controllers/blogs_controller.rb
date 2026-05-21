@@ -227,7 +227,6 @@ end
     @blog = current_user.blogs.find(params[:id])
   end
 
-  # Used for read action — anyone can read any blog
   def set_any_blog
     @blog = Blog.find(params[:id])
   end
@@ -256,7 +255,7 @@ end
   def redirect_after_save
     case params[:commit]
     when "Publish"
-      redirect_to root_path, notice: "Blog published to feed! 🎉"
+      redirect_to root_path, notice: "Blog published to feed! ✓"
     when "Save"
       redirect_to my_blogs_path, notice: "Blog saved successfully."
     when "Update Blog"
