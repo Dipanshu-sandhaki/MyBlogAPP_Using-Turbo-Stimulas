@@ -1,0 +1,327 @@
+.min-h-screen.bg-transparent.py-8.px-4.sm:px-6
+  .max-w-7xl.mx-auto
+
+    .flex.flex-col.sm:flex-row.items-start.sm:items-center.justify-between.mb-8.gap-4
+      %div
+        %h1.text-2xl.font-black.text-gray-900.dark:text-white Analytics
+        %p.text-sm.text-gray-500.dark:text-gray-400.mt-0.5
+          Hey #{current_user.email.split('@').first.capitalize} — here's how your content is performing.
+
+      .flex.bg-white.dark:bg-gray-900.border.border-gray-200.dark:border-gray-800.rounded-xl.p-1.shadow-sm.gap-0.5
+        = link_to "Daily",   dashboard_path(period: "daily"),   class: "px-4 py-1.5 text-sm font-bold rounded-lg transition-all #{params[:period] == 'daily' ? 'bg-blue-600 text-white shadow' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}"
+        = link_to "Weekly",  dashboard_path(period: "weekly"),  class: "px-4 py-1.5 text-sm font-bold rounded-lg transition-all #{params[:period].blank? || params[:period] == 'weekly' ? 'bg-blue-600 text-white shadow' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}"
+        = link_to "Monthly", dashboard_path(period: "monthly"), class: "px-4 py-1.5 text-sm font-bold rounded-lg transition-all #{params[:period] == 'monthly' ? 'bg-blue-600 text-white shadow' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}"
+
+    .grid.grid-cols-2.lg:grid-cols-4.gap-4.mb-6
+
+      .bg-white.dark:bg-gray-900.rounded-2xl.border.border-gray-200.dark:border-gray-800.shadow-sm.p-5.flex.flex-col.gap-3{style: "border-top:3px solid #3b82f6"}
+        .flex.items-center.justify-between
+          .flex.items-center.gap-2
+            .w-8.h-8.rounded-lg.flex.items-center.justify-center{style: "background:rgba(59,130,246,0.12)"}
+              = raw('<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>')
+            %span.text-xs.font-bold.uppercase.tracking-wider.text-gray-500.dark:text-gray-400 Posts
+          - if @blogs_delta
+            %span{class: "text-xs font-black px-2 py-0.5 rounded-full #{@blogs_delta >= 0 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' : 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400'}"}
+              = @blogs_delta >= 0 ? "↑#{@blogs_delta}%" : "↓#{@blogs_delta.abs}%"
+        %p.text-4xl.font-black.text-gray-900.dark:text-white= @total_blogs
+        .flex.items-center.justify-between
+          %span.text-xs.text-gray-400.dark:text-gray-500 #{@period_blogs} this period
+          %span.text-xs.text-gray-400.dark:text-gray-500.font-semibold #{@total_drafts} drafts
+
+      .bg-white.dark:bg-gray-900.rounded-2xl.border.border-gray-200.dark:border-gray-800.shadow-sm.p-5.flex.flex-col.gap-3{style: "border-top:3px solid #ef4444"}
+        .flex.items-center.justify-between
+          .flex.items-center.gap-2
+            .w-8.h-8.rounded-lg.flex.items-center.justify-center{style: "background:rgba(239,68,68,0.12)"}
+              = raw('<svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>')
+            %span.text-xs.font-bold.uppercase.tracking-wider.text-gray-500.dark:text-gray-400 Likes
+          - if @likes_delta
+            %span{class: "text-xs font-black px-2 py-0.5 rounded-full #{@likes_delta >= 0 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' : 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400'}"}
+              = @likes_delta >= 0 ? "↑#{@likes_delta}%" : "↓#{@likes_delta.abs}%"
+        %p.text-4xl.font-black.text-gray-900.dark:text-white= @total_likes
+        %span.text-xs.text-gray-400.dark:text-gray-500 #{@period_likes} this period
+
+      .bg-white.dark:bg-gray-900.rounded-2xl.border.border-gray-200.dark:border-gray-800.shadow-sm.p-5.flex.flex-col.gap-3{style: "border-top:3px solid #a855f7"}
+        .flex.items-center.justify-between
+          .flex.items-center.gap-2
+            .w-8.h-8.rounded-lg.flex.items-center.justify-center{style: "background:rgba(168,85,247,0.12)"}
+              = raw('<svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>')
+            %span.text-xs.font-bold.uppercase.tracking-wider.text-gray-500.dark:text-gray-400 Comments
+          - if @comments_delta
+            %span{class: "text-xs font-black px-2 py-0.5 rounded-full #{@comments_delta >= 0 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' : 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400'}"}
+              = @comments_delta >= 0 ? "↑#{@comments_delta}%" : "↓#{@comments_delta.abs}%"
+        %p.text-4xl.font-black.text-gray-900.dark:text-white= @total_comments
+        %span.text-xs.text-gray-400.dark:text-gray-500 #{@period_comments} this period
+
+      .bg-white.dark:bg-gray-900.rounded-2xl.border.border-gray-200.dark:border-gray-800.shadow-sm.p-5.flex.flex-col.gap-3{style: "border-top:3px solid #10b981"}
+        .flex.items-center.justify-between
+          .flex.items-center.gap-2
+            .w-8.h-8.rounded-lg.flex.items-center.justify-center{style: "background:rgba(16,185,129,0.12)"}
+              = raw('<svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>')
+            %span.text-xs.font-bold.uppercase.tracking-wider.text-gray-500.dark:text-gray-400 Engagement
+          %span.text-xs.font-bold.px-2.py-0.5.rounded-full.bg-emerald-100.text-emerald-700.dark:bg-emerald-900.dark:text-emerald-300 avg/post
+        %p.text-4xl.font-black.text-gray-900.dark:text-white= @engagement_rate
+        %span.text-xs.text-gray-400.dark:text-gray-500 #{@period_engagement} total this period
+
+    .grid.grid-cols-1.lg:grid-cols-4.gap-6.mb-6
+
+      .lg:col-span-3.bg-white.dark:bg-gray-900.rounded-2xl.border.border-gray-200.dark:border-gray-800.shadow-sm.p-6
+
+        .flex.items-center.justify-between.mb-5
+          %div
+            %h3.text-sm.font-extrabold.text-gray-900.dark:text-white Engagement Timeline
+            %p.text-xs.text-gray-400.dark:text-gray-500.mt-0.5 Likes, Comments & Posts over time
+          .flex.items-center.gap-4
+            .flex.items-center.gap-1.5
+              .w-2.h-2.rounded-full{style: "background:#3b82f6"}
+              %span.text-xs.font-semibold.text-gray-400.dark:text-gray-500 Likes
+            .flex.items-center.gap-1.5
+              .w-2.h-2.rounded-full{style: "background:#a855f7"}
+              %span.text-xs.font-semibold.text-gray-400.dark:text-gray-500 Comments
+            .flex.items-center.gap-1.5
+              .w-2.h-2.rounded-full{style: "background:#10b981"}
+              %span.text-xs.font-semibold.text-gray-400.dark:text-gray-500 Posts
+
+        - if @has_data_in_period
+          - cw = 700; ch = 260; pl = 38; pr = 12; pt = 10; pb = 32
+          - iw = cw - pl - pr; ih = ch - pt - pb
+          - n = [(@labels.length - 1), 1].max
+          - all_vals = (@likes_data + @comments_data + @blogs_data)
+          - raw_max  = all_vals.max.to_i
+          - grid_step = [(raw_max.to_f / 4).ceil, 1].max
+          - tick_max  = [grid_step * 4, 1].max
+          - svg_series = [{ data: @likes_data, stroke: '#3b82f6', fill: 'rgba(59,130,246,0.10)' }, { data: @comments_data, stroke: '#a855f7', fill: 'rgba(168,85,247,0.10)' }, { data: @blogs_data, stroke: '#10b981', fill: 'rgba(16,185,129,0.10)' }]
+          - label_step = [(@labels.length / 7.0).ceil, 1].max
+
+          %svg.w-full{viewBox: "0 0 #{cw} #{ch}", xmlns: "http://www.w3.org/2000/svg", style: "height:260px;display:block"}
+            - 5.times do |i|
+              - tick_val = (grid_step * (4 - i)).round
+              - y_pos    = (pt + ih.to_f / 4 * i).round(2)
+              %line{x1: pl, y1: y_pos, x2: cw - pr, y2: y_pos, stroke: "#e5e7eb", "stroke-width": "1", class: "dark:[stroke:#374151]"}
+              %text{x: pl - 6, y: y_pos + 4, "text-anchor": "end", "font-size": "10", fill: "#9ca3af", "font-weight": "600", "font-family": "inherit"}= tick_val
+            - svg_series.each do |s|
+              - pts = s[:data].each_with_index.map { |v, i| [(pl + (i.to_f / n) * iw).round(2), (pt + ih - ([v, 0].max.to_f / tick_max) * ih).round(2)] }
+              - fill_d = "M #{pl},#{(pt + ih).round(2)} " + pts.map { |x, y| "L #{x},#{y}" }.join(" ") + " L #{(pl + iw).round(2)},#{(pt + ih).round(2)} Z"
+              %path{d: fill_d, fill: s[:fill], stroke: "none"}
+            - svg_series.each do |s|
+              - pts = s[:data].each_with_index.map { |v, i| [(pl + (i.to_f / n) * iw).round(2), (pt + ih - ([v, 0].max.to_f / tick_max) * ih).round(2)] }
+              - line_d = "M " + pts.map { |x, y| "#{x},#{y}" }.join(" L ")
+              %path{d: line_d, fill: "none", stroke: s[:stroke], "stroke-width": "2.5", "stroke-linecap": "round", "stroke-linejoin": "round"}
+              - pts.each do |x, y|
+                %circle{cx: x, cy: y, r: "3.5", fill: "white", stroke: s[:stroke], "stroke-width": "2"}
+            - @labels.each_with_index do |lbl, i|
+              - next unless i % label_step == 0 || i == @labels.length - 1
+              - x_pos = (pl + (i.to_f / n) * iw).round(2)
+              %text{x: x_pos, y: ch - 8, "text-anchor": "middle", "font-size": "10", fill: "#9ca3af", "font-weight": "600", "font-family": "inherit"}= lbl
+
+        - else
+          .flex.flex-col.items-center.justify-center.rounded-xl.border.border-dashed.border-gray-200.dark:border-gray-700{style: "height:260px"}
+            = raw('<svg class="w-8 h-8 text-gray-300 dark:text-gray-700 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>')
+            %p.text-sm.font-semibold.text-gray-400.dark:text-gray-600 No activity in this period
+            %p.text-xs.text-gray-400.dark:text-gray-600.mt-1 Publish a blog or get likes to see data
+
+      .lg:col-span-1.flex.flex-col.gap-4
+
+        .bg-white.dark:bg-gray-900.p-5.rounded-2xl.border.border-gray-200.dark:border-gray-800.shadow-sm
+          %p.text-xs.font-extrabold.uppercase.tracking-widest.text-gray-400.dark:text-gray-500.mb-4 This Period
+          .space-y-3
+            %div
+              .flex.items-center.justify-between.mb-1.5
+                %span.text-xs.font-semibold.text-gray-500.dark:text-gray-400 Posts
+                %span.text-xs.font-black.text-blue-500= @period_blogs
+              .w-full.h-1.5.bg-gray-100.dark:bg-gray-800.rounded-full
+                .h-1.5.rounded-full{style: "background:#3b82f6;width:#{@total_blogs > 0 ? [(@period_blogs.to_f / @total_blogs * 100).round, 100].min : 0}%"}
+            %div
+              .flex.items-center.justify-between.mb-1.5
+                %span.text-xs.font-semibold.text-gray-500.dark:text-gray-400 Likes
+                %span.text-xs.font-black.text-red-500= @period_likes
+              .w-full.h-1.5.bg-gray-100.dark:bg-gray-800.rounded-full
+                .h-1.5.rounded-full{style: "background:#ef4444;width:#{@total_likes > 0 ? [(@period_likes.to_f / @total_likes * 100).round, 100].min : 0}%"}
+            %div
+              .flex.items-center.justify-between.mb-1.5
+                %span.text-xs.font-semibold.text-gray-500.dark:text-gray-400 Comments
+                %span.text-xs.font-black.text-purple-500= @period_comments
+              .w-full.h-1.5.bg-gray-100.dark:bg-gray-800.rounded-full
+                .h-1.5.rounded-full{style: "background:#a855f7;width:#{@total_comments > 0 ? [(@period_comments.to_f / @total_comments * 100).round, 100].min : 0}%"}
+
+        .grid.grid-cols-2.gap-3
+          .bg-white.dark:bg-gray-900.p-4.rounded-2xl.border.border-gray-200.dark:border-gray-800.shadow-sm
+            %p.text-xs.font-bold.uppercase.tracking-wider.text-gray-400.dark:text-gray-500.mb-2 Active Day
+            %p.text-base.font-black.text-gray-900.dark:text-white= @most_active_day == "N/A" ? "—" : @most_active_day.slice(0, 3)
+            %p.text-xs.text-gray-400.dark:text-gray-500.mt-0.5= @most_active_day == "N/A" ? "no data" : "this period"
+          .bg-white.dark:bg-gray-900.p-4.rounded-2xl.border.border-gray-200.dark:border-gray-800.shadow-sm
+            %p.text-xs.font-bold.uppercase.tracking-wider.text-gray-400.dark:text-gray-500.mb-2 Drafts
+            %p.text-base.font-black.text-gray-900.dark:text-white= @total_drafts
+            %p.text-xs.text-gray-400.dark:text-gray-500.mt-0.5 unpublished
+
+        - if @best_blog
+          .bg-white.dark:bg-gray-900.p-4.rounded-2xl.border.border-gray-200.dark:border-gray-800.shadow-sm{style: "border-left:3px solid #f59e0b"}
+            .flex.items-center.gap-1.5.mb-2
+              = raw('<svg class="w-3.5 h-3.5 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>')
+              %p.text-xs.font-extrabold.uppercase.tracking-wider.text-amber-500 Best Post
+            %p.text-sm.font-bold.text-gray-900.dark:text-white.leading-snug{style: "display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden"}= @best_blog.title
+            .flex.items-center.gap-3.mt-2
+              .flex.items-center.gap-1
+                = raw('<svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>')
+                %span.text-xs.font-black.text-red-500= @best_blog.likes_count
+              .flex.items-center.gap-1
+                = raw('<svg class="w-3 h-3 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>')
+                %span.text-xs.font-black.text-purple-500= @best_blog.comments_count
+
+    .grid.grid-cols-1.lg:grid-cols-5.gap-6.mb-6
+
+      .lg:col-span-3.bg-white.dark:bg-gray-900.rounded-2xl.border.border-gray-200.dark:border-gray-800.shadow-sm.overflow-hidden
+
+        .px-6.py-4.border-b.border-gray-100.dark:border-gray-800.flex.items-center.justify-between
+          %div
+            %h3.text-sm.font-extrabold.text-gray-900.dark:text-white Top Performing Blogs
+            %p.text-xs.text-gray-400.dark:text-gray-500 Ranked by total engagement
+          = link_to "All blogs →", my_blogs_path, class: "text-xs font-bold text-blue-500 hover:text-blue-400 transition-colors"
+
+        - if @top_blogs.any?
+          - max_eng = [(@top_blogs.map { |b| b.likes_count + b.comments_count }.max), 1].max
+          - rank_colors = %w[#f59e0b #9ca3af #cd7f32 #6b7280 #6b7280]
+          - rank_bgs    = ['rgba(251,191,36,0.12)', 'rgba(156,163,175,0.12)', 'rgba(205,127,50,0.12)', 'rgba(107,114,128,0.08)', 'rgba(107,114,128,0.08)']
+          .divide-y.divide-gray-100.dark:divide-gray-800
+            - @top_blogs.each_with_index do |blog, i|
+              - engagement = blog.likes_count + blog.comments_count
+              - eng_pct    = [(engagement.to_f / max_eng * 100).round, 3].max
+              %div{class: "px-6 py-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"}
+                .flex.items-center.justify-center.w-6.h-6.rounded-md.text-xs.font-black.flex-shrink-0{style: "background:#{rank_bgs[i]};color:#{rank_colors[i]}"}= i + 1
+                .flex-1.min-w-0
+                  %p.text-sm.font-bold.text-gray-900.dark:text-white.truncate= blog.title
+                  .mt-1.w-full.h-1.bg-gray-100.dark:bg-gray-800.rounded-full
+                    .h-1.rounded-full{style: "background:linear-gradient(90deg,#3b82f6,#a855f7);width:#{eng_pct}%"}
+                  %p.text-xs.text-gray-400.dark:text-gray-500.mt-1= blog.created_at.strftime("%b %d, %Y")
+                .flex.items-center.gap-3.flex-shrink-0
+                  .flex.items-center.gap-1
+                    = raw('<svg class="w-3.5 h-3.5 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>')
+                    %span.text-xs.font-black.text-gray-700.dark:text-gray-300= blog.likes_count
+                  .flex.items-center.gap-1
+                    = raw('<svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>')
+                    %span.text-xs.font-black.text-gray-700.dark:text-gray-300= blog.comments_count
+                  %span{class: "min-w-[28px] text-center text-xs font-black px-2 py-0.5 rounded-full #{engagement > 10 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' : engagement > 3 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'}"}
+                    = engagement
+        - else
+          .flex.flex-col.items-center.justify-center.py-14
+            = raw('<svg class="w-8 h-8 text-gray-200 dark:text-gray-700 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>')
+            %p.text-sm.text-gray-400.dark:text-gray-600 No published blogs yet
+
+      .lg:col-span-2.bg-white.dark:bg-gray-900.rounded-2xl.border.border-gray-200.dark:border-gray-800.shadow-sm.overflow-hidden
+
+        .px-6.py-4.border-b.border-gray-100.dark:border-gray-800
+          %h3.text-sm.font-extrabold.text-gray-900.dark:text-white Recent Activity
+          %p.text-xs.text-gray-400.dark:text-gray-500 Latest interactions on your content
+
+        - if @recent_activity.any?
+          .divide-y.divide-gray-100.dark:divide-gray-800
+            - @recent_activity.each do |event|
+              %div{class: "px-5 py-3.5 flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"}
+                - u    = event[:user]
+                - init = u ? u.email[0].upcase : "?"
+                - is_like = event[:type] == 'like'
+                .w-7.h-7.rounded-full.flex.items-center.justify-center.text-xs.font-black.flex-shrink-0{style: "background:#{is_like ? 'rgba(239,68,68,0.12)' : 'rgba(168,85,247,0.12)'};color:#{is_like ? '#ef4444' : '#a855f7'}"}= init
+                .flex-1.min-w-0
+                  .flex.items-center.flex-wrap.gap-x-1
+                    %span.text-xs.font-bold.text-gray-900.dark:text-white= u ? u.email.split('@').first : "Someone"
+                    %span.text-xs.text-gray-400.dark:text-gray-500= is_like ? "liked" : "commented on"
+                    %span.text-xs.font-semibold.text-blue-500.truncate{style: "max-width:100px"}= event[:blog]&.title.to_s.truncate(25)
+                  - if !is_like && event[:body].present?
+                    %p.text-xs.text-gray-400.dark:text-gray-500.mt-0.5.italic.truncate= "\"#{event[:body]}\""
+                  %p.text-xs.text-gray-400.dark:text-gray-500.mt-0.5= time_ago_in_words(event[:at]) + " ago"
+                - if is_like
+                  = raw('<svg class="w-3.5 h-3.5 text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>')
+                - else
+                  = raw('<svg class="w-3.5 h-3.5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>')
+        - else
+          .flex.flex-col.items-center.justify-center.py-14
+            = raw('<svg class="w-8 h-8 text-gray-200 dark:text-gray-700 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>')
+            %p.text-sm.text-gray-400.dark:text-gray-600 No recent activity yet
+
+    .grid.grid-cols-1.lg:grid-cols-3.gap-6.mb-6
+
+      .bg-white.dark:bg-gray-900.rounded-2xl.border.border-gray-200.dark:border-gray-800.shadow-sm.p-6{style: "border-top:3px solid #06b6d4"}
+        .flex.items-center.gap-2.mb-5
+          .w-8.h-8.rounded-lg.flex.items-center.justify-center{style: "background:rgba(6,182,212,0.12)"}
+            = raw('<svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>')
+          %h3.text-sm.font-extrabold.text-gray-900.dark:text-white Network
+        .grid.grid-cols-2.gap-4.mb-4
+          %div
+            %p.text-3xl.font-black.text-gray-900.dark:text-white= @total_followers
+            %p.text-xs.font-semibold.text-gray-400.dark:text-gray-500.mt-1 Followers
+          %div
+            %p.text-3xl.font-black.text-gray-900.dark:text-white= @total_following
+            %p.text-xs.font-semibold.text-gray-400.dark:text-gray-500.mt-1 Following
+        - ratio = @total_following > 0 ? (@total_followers.to_f / @total_following).round(2) : @total_followers
+        .pt-4.border-t.border-gray-100.dark:border-gray-800
+          .flex.items-center.justify-between
+            %span.text-xs.font-semibold.text-gray-400.dark:text-gray-500 Follower ratio
+            %span.text-xs.font-black{class: ratio >= 1 ? 'text-emerald-500' : 'text-amber-500'}= "#{ratio}×"
+          .w-full.h-1.5.bg-gray-100.dark:bg-gray-800.rounded-full.mt-2
+            - ratio_pct = [[(@total_followers.to_f / [@total_followers + @total_following, 1].max * 100).round, 100].min, 2].max
+            .h-1.5.rounded-full{style: "background:linear-gradient(90deg,#06b6d4,#3b82f6);width:#{ratio_pct}%"}
+
+      .lg:col-span-2.bg-white.dark:bg-gray-900.rounded-2xl.border.border-gray-200.dark:border-gray-800.shadow-sm.overflow-hidden
+
+        .px-6.py-4.border-b.border-gray-100.dark:border-gray-800.flex.items-center.justify-between
+          %div
+            %h3.text-sm.font-extrabold.text-gray-900.dark:text-white Recent Followers
+            %p.text-xs.text-gray-400.dark:text-gray-500 People who recently followed you
+          - if @total_followers > 0
+            %span.text-xs.font-black.px-2.py-0.5.rounded-full.bg-cyan-100.text-cyan-700.dark:bg-cyan-900.dark:text-cyan-300= "#{@total_followers} total"
+
+        - if @recent_followers.any?
+          .divide-y.divide-gray-100.dark:divide-gray-800
+            - @recent_followers.each do |follower|
+              - init = follower.email[0].upcase
+              - colors = %w[#3b82f6 #a855f7 #ef4444 #10b981 #f59e0b #06b6d4]
+              - color  = colors[follower.id % colors.length]
+              %div{class: "px-6 py-3.5 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"}
+                .w-9.h-9.rounded-full.flex.items-center.justify-center.text-sm.font-black.flex-shrink-0{style: "background:#{color}22;color:#{color}"}= init
+                .flex-1.min-w-0
+                  %p.text-sm.font-bold.text-gray-900.dark:text-white.truncate= follower.email.split('@').first
+                  %p.text-xs.text-gray-400.dark:text-gray-500= follower.email
+                - if follower.respond_to?(:created_at)
+                  %span.text-xs.text-gray-400.dark:text-gray-500.flex-shrink-0= time_ago_in_words(follower.created_at) + " ago"
+        - else
+          .flex.flex-col.items-center.justify-center.py-12
+            = raw('<svg class="w-8 h-8 text-gray-200 dark:text-gray-700 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>')
+            %p.text-sm.text-gray-400.dark:text-gray-600 No followers yet
+            %p.text-xs.text-gray-400.dark:text-gray-600.mt-1 Share your blogs to grow your audience
+
+    - if @all_blogs_stats.any?
+      .bg-white.dark:bg-gray-900.rounded-2xl.border.border-gray-200.dark:border-gray-800.shadow-sm.overflow-hidden
+
+        .px-6.py-4.border-b.border-gray-100.dark:border-gray-800
+          %h3.text-sm.font-extrabold.text-gray-900.dark:text-white Blog Performance Breakdown
+          %p.text-xs.text-gray-400.dark:text-gray-500 All published blogs with individual stats
+
+        .overflow-x-auto
+          %table.w-full.text-sm
+            %thead
+              %tr{class: "bg-gray-0 dark:bg-gray-900"}
+                %th.px-6.py-3.text-left.text-xs.font-extrabold.uppercase.tracking-wider.text-gray-400.dark:text-gray-500 Blog Title
+                %th.px-6.py-3.text-left.text-xs.font-extrabold.uppercase.tracking-wider.text-gray-400.dark:text-gray-500 Published
+                %th.px-6.py-3.text-center.text-xs.font-extrabold.uppercase.tracking-wider.text-gray-400.dark:text-gray-500 Likes
+                %th.px-6.py-3.text-center.text-xs.font-extrabold.uppercase.tracking-wider.text-gray-400.dark:text-gray-500 Comments
+                %th.px-6.py-3.text-center.text-xs.font-extrabold.uppercase.tracking-wider.text-gray-400.dark:text-gray-500 Total
+                %th.px-6.py-3.text-left.text-xs.font-extrabold.uppercase.tracking-wider.text-gray-400.dark:text-gray-500 Engagement Bar
+            %tbody.divide-y.divide-gray-100.dark:divide-gray-800
+              - max_total = [(@all_blogs_stats.map { |b| b.likes_count + b.comments_count }.max), 1].max
+              - @all_blogs_stats.each do |blog|
+                - total = blog.likes_count + blog.comments_count
+                - bar_w = [(total.to_f / max_total * 100).round, 2].max
+                %tr{class: "hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"}
+                  %td.px-6.py-4
+                    %p.font-semibold.text-gray-900.dark:text-white.max-w-xs.truncate= blog.title
+                  %td.px-6.py-4.text-xs.text-gray-400.dark:text-gray-500.whitespace-nowrap= blog.created_at.strftime("%b %d, %Y")
+                  %td.px-6.py-4.text-center
+                    %span.font-black.text-red-500= blog.likes_count
+                  %td.px-6.py-4.text-center
+                    %span.font-black.text-purple-500= blog.comments_count
+                  %td.px-6.py-4.text-center
+                    %span{class: "font-black text-xs px-2 py-0.5 rounded-full #{total > 10 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' : total > 3 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'}"}= total
+                  %td.px-6.py-4
+                    .flex.items-center.gap-2
+                      .flex-1.h-1.5.bg-gray-100.dark:bg-gray-800.rounded-full{style: "max-width:120px"}
+                        .h-1.5.rounded-full{style: "background:linear-gradient(90deg,#3b82f6,#a855f7);width:#{bar_w}%"}
+                      %span.text-xs.text-gray-400.dark:text-gray-500= "#{bar_w}%"

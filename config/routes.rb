@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
+  
   devise_for :users, controllers: {
     registrations: "users/registrations"
   }
@@ -8,8 +8,9 @@ Rails.application.routes.draw do
 
   root "feed#index"
 
-  get "/my-blogs",  to: "blogs#index",  as: :my_blogs
-  get "/drafts",    to: "blogs#drafts", as: :drafts
+  get "/my-blogs",  to: "blogs#index",      as: :my_blogs
+  get "/drafts",    to: "blogs#drafts",     as: :drafts
+  get "/dashboard", to: "dashboards#index", as: :dashboard
 
   resources :blogs do
     collection do

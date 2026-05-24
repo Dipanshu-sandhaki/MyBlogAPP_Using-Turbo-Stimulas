@@ -3,19 +3,18 @@ require "csv"
 class BlogsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_blog,     only: %i[show edit update destroy]
-  before_action :set_any_blog, only: %i[read]
+  before_action :set_any_blog, only: %i[read share_email]
 
-  # GET /my-blogs
   def index
+    authorize! :read, Blog
     @page     = (params[:page] || 1).to_i
     @per_page = 5
 
     base_query = current_user.blogs.where(status: %w[saved published])
 
-    @blogs    = base_query.order(created_at: :desc)
-                          .limit(@per_page)
-                          .offset((@page - 1) * @per_page)
-
+    @blogs = base_query.order(created_at: :desc)
+                             .limit(@per_page)
+                             .offset((@page - 1) * @per_page)
     @has_more    = base_query.count > (@page * @per_page)
     @all_blog_ids = base_query.pluck(:id)
 
@@ -48,8 +47,8 @@ class BlogsController < ApplicationController
     end
   end
 
-  # GET /drafts
   def drafts
+    authorize! :create, Blog
     @page     = (params[:page] || 1).to_i
     @per_page = 5
 
@@ -57,25 +56,29 @@ class BlogsController < ApplicationController
                              .order(updated_at: :desc)
                              .limit(@per_page)
                              .offset((@page - 1) * @per_page)
-
     @has_more = current_user.blogs.draft.count > (@page * @per_page)
   end
 
   def new
+    authorize! :create, Blog
     @blog = current_user.blogs.build
   end
 
   def show
+    authorize! :read, @blog
   end
 
   def read
+    authorize! :read, @blog
     @comments = @blog.comments.order(created_at: :desc)
   end
 
   def edit
+    authorize! :update, @blog
   end
 
   def create
+    authorize! :create, Blog
     @blog = current_user.blogs.build(blog_params)
 
     if ["Discard", "Back"].include?(params[:commit])
@@ -103,6 +106,8 @@ class BlogsController < ApplicationController
   end
 
   def update
+    authorize! :update, @blog
+
     if ["Discard", "Back"].include?(params[:commit])
       if blog_content_empty?
         redirect_to my_blogs_path, notice: "Discarded empty changes."
@@ -128,10 +133,12 @@ class BlogsController < ApplicationController
   end
 
   def bulk_upload
+    authorize! :bulk_upload, Blog
     render partial: "blogs/bulk_upload"
   end
 
   def bulk_create
+    authorize! :bulk_create, Blog
     if params[:file].blank?
       redirect_to my_blogs_path, alert: "Please upload a CSV file" and return
     end
@@ -180,6 +187,7 @@ class BlogsController < ApplicationController
   end
 
   def bulk_delete
+    authorize! :bulk_delete, Blog
     ids = params[:ids]
 
     if ids.present?
@@ -196,6 +204,7 @@ class BlogsController < ApplicationController
   end
 
   def destroy
+    authorize! :destroy, @blog
     @was_draft = @blog.draft?
     @blog.destroy
 
@@ -208,18 +217,18 @@ class BlogsController < ApplicationController
   end
 
   def share_email
-  @blog = Blog.find(params[:id])
-  recipient_email = params[:recipient_email].to_s.strip
+    authorize! :share_email, @blog
+    recipient_email = params[:recipient_email].to_s.strip
 
-  if recipient_email.match?(/\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i)
-    ArticleMailer.send_article_notification(recipient_email, @blog).deliver_now
-    flash[:notice] = "Article sent to #{recipient_email} successfully!"
-  else
-    flash[:alert] = "Please enter a valid email address."
+    if recipient_email.match?(/\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i)
+      ArticleMailer.send_article_notification(recipient_email, @blog).deliver_now
+      flash[:notice] = "Article sent to #{recipient_email} successfully!"
+    else
+      flash[:alert] = "Please enter a valid email address."
+    end
+
+    redirect_to read_blog_path(@blog)
   end
-
-  redirect_to read_blog_path(@blog)
-end
 
   private
 
@@ -243,12 +252,9 @@ end
 
   def resolve_status
     case params[:commit]
-    when "Publish"
-      "published"
-    when "Save"
-      @blog.published? ? "published" : "saved"
-    else
-      @blog.status || "draft"
+    when "Publish"  then "published"
+    when "Save"     then @blog.published? ? "published" : "saved"
+    else                 @blog.status || "draft"
     end
   end
 

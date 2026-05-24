@@ -59,6 +59,7 @@ end
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = true
 
+  config.assets.server_side_preloading = false
 
   config.action_mailer.perform_deliveries = true
   

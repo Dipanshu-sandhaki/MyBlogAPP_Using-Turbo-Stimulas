@@ -1,18 +1,126 @@
-.flex.items-center.justify-center.min-h-screen.bg-gray-100.dark:bg-gray-900.px-4
-  .w-full.max-w-md.bg-white.dark:bg-gray-800.rounded-xl.shadow-lg.border.border-gray-200.dark:border-gray-700.p-6
-    %h2.text-2xl.font-bold.text-center.text-green-600.dark:text-green-400.mb-6
-      Create Account
-    = form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-4" }) do |f|
-      %div
-        = f.label :email, class: "block mb-1 text-sm text-gray-700 dark:text-gray-300"
-        = f.email_field :email, class: "w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 outline-none"
-      %div
-        = f.label :password, class: "block mb-1 text-sm text-gray-700 dark:text-gray-300"
-        = f.password_field :password, class: "w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 outline-none"
-      %div
-        = f.label :password_confirmation, class: "block mb-1 text-sm text-gray-700 dark:text-gray-300"
-        = f.password_field :password_confirmation, class: "w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 outline-none"
-      = f.submit "Sign up", class: "w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition cursor-pointer"
-    .mt-4.text-center.text-sm.text-gray-600.dark:text-gray-400
+.min-h-screen.bg-gray-50.dark:bg-gray-900.flex.flex-col.justify-center.py-12.px-4
+
+  .w-full.max-w-md.mx-auto
+
+    .text-center.mb-6
+      %h2.text-2xl.font-extrabold.text-gray-900.dark:text-white
+        Create your account
+      %p.text-sm.text-gray-500.dark:text-gray-400.mt-1
+        Join TurboBlog today
+
+    .bg-white.dark:bg-gray-800.rounded-2xl.shadow-md.border.border-gray-200.dark:border-gray-700.px-8.py-8
+
+      = form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-4" }) do |f|
+
+        %div
+          = f.label :email, class: "block mb-1 text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-200"
+          = f.email_field :email, autofocus: true, autocomplete: "email",
+              placeholder: "you@example.com",
+              class: "w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+
+        %div
+          = f.label :password, class: "block mb-1 text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-200"
+          = f.password_field :password, autocomplete: "new-password",
+              placeholder: "Min. 6 characters",
+              class: "w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+
+        %div
+          = f.label :password_confirmation, "Confirm Password", class: "block mb-1 text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-200"
+          = f.password_field :password_confirmation, autocomplete: "new-password",
+              placeholder: "Repeat password",
+              class: "w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+
+        %div
+          %p.text-xs.font-bold.uppercase.tracking-wider.text-gray-700.dark:text-gray-200.mb-2
+            Join as
+          .grid.grid-cols-2.gap-3
+
+            %label.role-card.cursor-pointer.rounded-xl.border-2.px-4.py-3.flex.items-center.gap-3.transition-all.duration-200{"data-role" => "viewer", "for" => "user_role_viewer"}
+              = f.radio_button :role, :viewer, id: "user_role_viewer", class: "sr-only"
+              .w-9.h-9.rounded-lg.flex.items-center.justify-center.shrink-0.viewer-icon-bg
+                %svg.w-5.h-5.text-green-600.dark:text-green-400{fill: "none", stroke: "currentColor", "stroke-width" => "2", viewbox: "0 0 24 24"}
+                  %path{d: "M15 12a3 3 0 11-6 0 3 3 0 016 0z", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+                  %path{d: "M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+              %div
+                %p.text-sm.font-bold.text-gray-900.dark:text-white.leading-tight Viewer
+                %p.text-xs.text-gray-500.dark:text-gray-400.leading-tight.mt-0.5 Read & explore
+
+            %label.role-card.cursor-pointer.rounded-xl.border-2.px-4.py-3.flex.items-center.gap-3.transition-all.duration-200{"data-role" => "writer", "for" => "user_role_writer"}
+              = f.radio_button :role, :writer, id: "user_role_writer", class: "sr-only"
+              .w-9.h-9.rounded-lg.flex.items-center.justify-center.shrink-0.writer-icon-bg
+                %svg.w-5.h-5.text-blue-600.dark:text-blue-400{fill: "none", stroke: "currentColor", "stroke-width" => "2", viewbox: "0 0 24 24"}
+                  %path{d: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+              %div
+                %p.text-sm.font-bold.text-gray-900.dark:text-white.leading-tight Writer
+                %p.text-xs.text-gray-500.dark:text-gray-400.leading-tight.mt-0.5 Write & publish
+
+        = f.submit "Create Account", class: "w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-2.5 rounded-xl font-bold text-sm tracking-wide transition cursor-pointer shadow-sm mt-1"
+
+    .mt-5.text-center.text-sm.text-gray-600.dark:text-gray-400
       Already have an account?
-      = link_to "Login", new_session_path(resource_name), class: "text-blue-600 dark:text-blue-400 hover:underline"
+      = link_to "Sign in", new_session_path(resource_name), class: "text-blue-600 dark:text-blue-400 font-semibold hover:underline ml-1"
+
+:css
+  html.dark body,
+  html.dark .min-h-screen {
+    background-color: #111827 !important;
+  }
+
+  .viewer-icon-bg { background-color: #f0fdf4; }
+  .writer-icon-bg { background-color: #eff6ff; }
+  html.dark .viewer-icon-bg { background-color: #1f2937; }
+  html.dark .writer-icon-bg { background-color: #1f2937; }
+
+  .role-card {
+    border-color: #e5e7eb;
+    background-color: transparent;
+  }
+  html.dark .role-card {
+    border-color: #4b5563;
+    background-color: transparent;
+  }
+  .role-card:hover {
+    border-color: #d1d5db;
+    background-color: #f9fafb;
+  }
+  html.dark .role-card:hover {
+    border-color: #6b7280;
+    background-color: rgba(255, 255, 255, 0.04);
+  }
+
+  .role-card[data-selected="viewer"] {
+    border-color: #22c55e;
+    background-color: #f0fdf4;
+  }
+  html.dark .role-card[data-selected="viewer"] {
+    border-color: #22c55e;
+    background-color: rgba(20, 83, 45, 0.25);
+  }
+
+  .role-card[data-selected="writer"] {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+  }
+  html.dark .role-card[data-selected="writer"] {
+    border-color: #3b82f6;
+    background-color: rgba(30, 58, 138, 0.25);
+  }
+
+:javascript
+  (function () {
+    var radios = document.querySelectorAll('input[name="user[role]"]');
+    var cards  = document.querySelectorAll('.role-card');
+
+    function updateCards() {
+      cards.forEach(function (card) { delete card.dataset.selected; });
+      radios.forEach(function (radio) {
+        if (radio.checked) {
+          var label = document.querySelector('label[for="' + radio.id + '"]');
+          if (label) label.dataset.selected = radio.value;
+        }
+      });
+    }
+
+    radios.forEach(function (r) { r.addEventListener('change', updateCards); });
+    updateCards();
+  })();

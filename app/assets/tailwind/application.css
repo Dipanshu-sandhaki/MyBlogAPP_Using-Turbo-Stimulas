@@ -4,14 +4,15 @@
 
 html,
 body {
-  background-color: #f3f4f6;
+  min-height: 100%;
+  background-color: #ffffff;
   color: #111827;
 }
 
 html.dark,
 html.dark body {
   background-color: #030712 !important;
-  color: #f9fafb;
+  color: #f9fafb !important;
 }
 
 @keyframes slide-in {
@@ -19,6 +20,7 @@ html.dark body {
     opacity: 0;
     transform: translateX(40px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -29,21 +31,24 @@ html.dark body {
   animation: slide-in 0.3s ease-out;
 }
 
-/* Custom Scrollbar */
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(99, 102, 241, 0.35) transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(99, 102, 241, 0.35);
   border-radius: 99px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(99, 102, 241, 0.65);
 }

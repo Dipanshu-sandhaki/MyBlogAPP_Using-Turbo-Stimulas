@@ -2,15 +2,15 @@ class CommentsController < ApplicationController
   before_action :authenticate_user!
 
   def create
-    @blog = Blog.find(params[:blog_id])
+    @blog    = Blog.find(params[:blog_id])
     @comment = @blog.comments.build(comment_params)
     @comment.user = current_user
 
+    authorize! :create, @comment
+
     if @comment.parent_id.present?
-      clicked_comment = @blog.comments.find_by(id: @comment.parent_id)
-      
-      @replied_form_id = clicked_comment&.id 
-      
+      clicked_comment  = @blog.comments.find_by(id: @comment.parent_id)
+      @replied_form_id = clicked_comment&.id
       @comment.parent_id = clicked_comment&.parent_id || clicked_comment&.id
     end
 
@@ -31,6 +31,7 @@ class CommentsController < ApplicationController
 
   def update
     @comment = current_user.comments.find(params[:id])
+    authorize! :update, @comment
     @blog = @comment.blog
 
     respond_to do |format|
@@ -45,8 +46,10 @@ class CommentsController < ApplicationController
 
   def destroy
     @comment = current_user.comments.find(params[:id])
+    authorize! :destroy, @comment
     @blog = @comment.blog
     @comment.destroy
+
     respond_to do |format|
       format.turbo_stream
     end
