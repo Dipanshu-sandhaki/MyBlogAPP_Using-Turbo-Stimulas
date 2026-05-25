@@ -1,4 +1,3 @@
-cat > config/importmap.rb << 'EOF'
 pin "application"
 pin "@hotwired/turbo-rails", to: "turbo.min.js"
 pin "@hotwired/stimulus", to: "stimulus.min.js"
@@ -20,4 +19,3 @@ pin "trix"
 pin "@rails/actiontext", to: "actiontext.esm.js"
 pin "chart.js"
 pin "@kurkle/color", to: "@kurkle--color.js"
-EOF

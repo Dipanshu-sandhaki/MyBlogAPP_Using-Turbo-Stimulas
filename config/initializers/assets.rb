@@ -1,4 +1,3 @@
-cat > config/initializers/assets.rb << 'EOF'
 Rails.application.config.assets.version = "1.0"
 Rails.application.config.assets.paths << Rails.root.join("app/javascript")
 Rails.application.config.assets.precompile += %w[
@@ -16,4 +15,3 @@ Rails.application.config.assets.precompile += %w[
   controllers/modal_controller.js
   controllers/read_more_controller.js
 ]
-EOF
