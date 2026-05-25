@@ -6,6 +6,9 @@ application.register("blog-editor", BlogEditorController)
 import BulkSelectController from "./bulk_select_controller"
 application.register("bulk-select", BulkSelectController)
 
+import BulkUploadController from "./bulk_upload_controller"
+application.register("bulk-upload", BulkUploadController)
+
 import CommentEditController from "./comment_edit_controller"
 application.register("comment-edit", CommentEditController)
 
@@ -29,6 +32,3 @@ application.register("modal", ModalController)
 
 import ReadMoreController from "./read_more_controller"
 application.register("read-more", ReadMoreController)
-
-import BulkUploadController from "./bulk_upload_controller"
-application.register("bulk-upload", BulkUploadController)
