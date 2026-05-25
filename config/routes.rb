@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       get  :bulk_upload
       post :bulk_create
       delete :bulk_delete
+      delete :empty_drafts
     end
 
     member do

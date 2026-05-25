@@ -216,6 +216,13 @@ class BlogsController < ApplicationController
     end
   end
 
+  def empty_drafts
+  authorize! :create, Blog
+  count = current_user.blogs.draft.count
+  current_user.blogs.draft.destroy_all
+  redirect_to drafts_path, notice: "#{count} draft#{'s' if count != 1} deleted. Your drafts are now empty."
+end
+
   def share_email
     authorize! :share_email, @blog
     recipient_email = params[:recipient_email].to_s.strip

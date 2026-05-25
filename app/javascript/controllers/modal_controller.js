@@ -112,4 +112,12 @@ export default class extends Controller {
   _unlockScroll() {
     document.body.classList.remove("overflow-hidden")
   }
+
+  openEmptyDrafts() {
+  document.getElementById("empty-drafts-modal").classList.remove("hidden");
+  }
+
+closeEmptyDrafts() {
+  document.getElementById("empty-drafts-modal").classList.add("hidden");
+  }
 }

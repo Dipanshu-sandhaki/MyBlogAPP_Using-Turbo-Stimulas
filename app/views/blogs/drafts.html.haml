@@ -6,10 +6,19 @@
       Back to My Blogs
 
     .mb-10.border-b.border-gray-300.dark:border-gray-500.pb-6
-      %h1.text-4xl.font-extrabold.tracking-tight.text-gray-900.dark:text-white
-        Drafts
-      %p.mt-2.text-base.font-medium.text-gray-600.dark:text-gray-300
-        = (@drafts.empty? && @page == 1) ? "Nothing in progress yet." : "Pick up right where you left off."
+      .flex.items-center.justify-between.gap-4
+        .flex-1
+          %h1.text-4xl.font-extrabold.tracking-tight.text-gray-900.dark:text-white
+            Drafts
+          %p.mt-2.text-base.font-medium.text-gray-600.dark:text-gray-300
+            = (@drafts.empty? && @page == 1) ? "Nothing in progress yet." : "Pick up right where you left off."
+
+        - unless @drafts.empty? && @page == 1
+          %div{id: "empty-drafts-btn"}
+            %button.inline-flex.items-center.gap-2.px-5.rounded-xl.text-sm.font-bold.bg-red-600.text-white.border.border-red-700.hover:bg-red-700.transition-all.duration-200.shrink-0{class: "py-2.5", onclick: "document.getElementById('empty-drafts-modal').classList.remove('hidden')", type: "button"}
+              %svg.w-4.h-4.stroke-current{fill: "none", stroke: "currentColor", "stroke-width" => "2.5", viewbox: "0 0 24 24"}
+                %path{d: "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+              Empty Drafts
 
     #drafts-section
       - if @drafts.empty? && @page == 1
@@ -60,13 +69,13 @@
                         %path{d: "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
                       Delete
 
-          - if @has_more
-            %turbo-frame{id: "drafts_page_#{@page + 1}"}
-              .mt-8.flex.justify-center.pb-4
-                = link_to drafts_path(page: @page + 1), class: "inline-flex items-center gap-2 px-8 py-3 rounded-full text-sm font-bold tracking-wide bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-400 dark:hover:text-blue-400 shadow-sm hover:shadow-md transition-all duration-200 group" do
-                  %svg.w-4.h-4.stroke-current.group-hover:animate-bounce{fill: "none", "stroke-width" => "2.5", viewbox: "0 0 24 24"}
-                    %path{d: "M19 9l-7 7-7-7", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
-                  Load More
+        - if @has_more
+          %turbo-frame{id: "drafts_page_#{@page + 1}"}
+            .mt-8.flex.justify-center.pb-4
+              = link_to drafts_path(page: @page + 1), class: "inline-flex items-center gap-2 px-8 py-3 rounded-full text-sm font-bold tracking-wide bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-400 dark:hover:text-blue-400 shadow-sm hover:shadow-md transition-all duration-200 group" do
+                %svg.w-4.h-4.stroke-current.group-hover:animate-bounce{fill: "none", "stroke-width" => "2.5", viewbox: "0 0 24 24"}
+                  %path{d: "M19 9l-7 7-7-7", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+                Load More
 
   %div{id: "delete-modal", class: "hidden fixed inset-0 z-[9999] flex items-center justify-center", "data-modal-target" => "deleteModal"}
     %div{class: "absolute inset-0 bg-gray-900/60 dark:bg-gray-900/80 backdrop-blur-sm", "data-action" => "click->modal#closeDelete"}
@@ -87,8 +96,46 @@
             %button.px-5.py-2.5.text-sm.font-bold.text-white.bg-red-600.hover:bg-red-700.rounded-xl.shadow-md.transition-all.inline-flex.items-center.justify-center{"data-action" => "click->modal#confirmDelete", type: "button"}
               Yes, Delete
 
+  %div{id: "empty-drafts-modal", class: "hidden fixed inset-0 z-[9999] flex items-center justify-center"}
+    %div{class: "absolute inset-0 bg-gray-900/60 dark:bg-gray-900/80 backdrop-blur-sm", onclick: "document.getElementById('empty-drafts-modal').classList.add('hidden')"}
+    .relative.p-4.w-full.max-w-md
+      .relative.bg-white.dark:bg-gray-800.rounded-2xl.shadow-2xl.border.border-gray-200.dark:border-gray-700
+        .p-6.text-center
+          .mx-auto.mb-5.flex.items-center.justify-center.w-14.h-14.rounded-full.bg-red-100{class: "dark:bg-red-900/40"}
+            %svg.w-7.h-7.text-red-600.dark:text-red-500{fill: "none", viewbox: "0 0 24 24"}
+              %path{d: "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16", stroke: "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2"}
+          %h3.mb-2.text-xl.font-bold.text-gray-900.dark:text-white Empty All Drafts?
+          %p.mb-6.text-sm.text-gray-500.dark:text-gray-400
+            This will permanently delete
+            %strong.text-gray-700.dark:text-gray-200 all
+            your drafts at once.
+            %br/
+            This cannot be undone.
+          .flex.justify-center.items-center.gap-3
+            %button.px-5.text-sm.font-bold.text-gray-700.dark:text-gray-300.bg-white.dark:bg-gray-800.border.border-gray-300.dark:border-gray-600.rounded-xl.hover:bg-gray-50.dark:hover:bg-gray-700.transition-all{class: "py-2.5", onclick: "document.getElementById('empty-drafts-modal').classList.add('hidden')", type: "button"}
+              Cancel
+            = button_to empty_drafts_blogs_path, method: :delete, class: "px-5 py-2.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md transition-all inline-flex items-center gap-2 cursor-pointer" do
+              %svg.w-4.h-4.stroke-current{fill: "none", stroke: "currentColor", "stroke-width" => "2.5", viewbox: "0 0 24 24"}
+                %path{d: "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+              Yes, Empty All
+
 :css
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+
+:javascript
+  (function() {
+    const section = document.getElementById('drafts-section');
+    if (!section) return;
+
+    const observer = new MutationObserver(function() {
+      const btn = document.getElementById('empty-drafts-btn');
+      if (!btn) return;
+      const hasCards = section.querySelectorAll('[id^="blog_"]').length > 0;
+      btn.style.display = hasCards ? '' : 'none';
+    });
+
+    observer.observe(section, { childList: true, subtree: true });
+  })();
