@@ -82,3 +82,7 @@ gem "rubocop", "~> 1.86"
 gem 'haml-rails'
 
 gem "cancancan"
+
+gem "cloudinary"
+
+gem "activestorage-cloudinary-service"

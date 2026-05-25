@@ -81,6 +81,4 @@ test:
 #
 production:
   <<: *default
-  database: turbo_blog_production
-  username: turbo_blog
-  password: <%= ENV["TURBO_BLOG_DATABASE_PASSWORD"] %>
+  url: <%= ENV["DATABASE_URL"] %>
