@@ -1,4 +1,23 @@
-#!/usr/bin/env ruby
-
-require_relative "../config/application"
-require "importmap/commands"
+cat > config/importmap.rb << 'EOF'
+pin "application"
+pin "@hotwired/turbo-rails", to: "turbo.min.js"
+pin "@hotwired/stimulus", to: "stimulus.min.js"
+pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
+pin "controllers/application", to: "controllers/application.js"
+pin "controllers/index", to: "controllers/index.js"
+pin "controllers/blog_editor_controller", to: "controllers/blog_editor_controller.js"
+pin "controllers/bulk_select_controller", to: "controllers/bulk_select_controller.js"
+pin "controllers/bulk_upload_controller", to: "controllers/bulk_upload_controller.js"
+pin "controllers/comment_edit_controller", to: "controllers/comment_edit_controller.js"
+pin "controllers/darkmode_controller", to: "controllers/darkmode_controller.js"
+pin "controllers/dropdown_controller", to: "controllers/dropdown_controller.js"
+pin "controllers/flash_controller", to: "controllers/flash_controller.js"
+pin "controllers/form_controller", to: "controllers/form_controller.js"
+pin "controllers/hello_controller", to: "controllers/hello_controller.js"
+pin "controllers/modal_controller", to: "controllers/modal_controller.js"
+pin "controllers/read_more_controller", to: "controllers/read_more_controller.js"
+pin "trix"
+pin "@rails/actiontext", to: "actiontext.esm.js"
+pin "chart.js"
+pin "@kurkle/color", to: "@kurkle--color.js"
+EOF
