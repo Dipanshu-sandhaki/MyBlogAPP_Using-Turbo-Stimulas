@@ -10,7 +10,7 @@ Rails.application.configure do
   config.public_file_server.enabled = true
 
   # Assets
-  config.assets.compile = false
+  config.assets.compile = true
   config.assets.digest = true
 
   # Active Storage
