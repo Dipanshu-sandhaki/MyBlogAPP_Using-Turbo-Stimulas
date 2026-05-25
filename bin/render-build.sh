@@ -9,6 +9,11 @@ bundle exec rails assets:precompile
 bundle exec rails assets:clean
 bundle exec rails db:migrate
 
-echo "=== COMPILED CONTROLLERS ==="
-ls public/assets/controllers/ 2>/dev/null || echo "NO CONTROLLERS DIRECTORY FOUND"
-echo "==========================="
+echo "=== Copying JS controllers to public/assets ==="
+mkdir -p public/assets/controllers
+for f in app/javascript/controllers/*.js; do
+  name=$(basename "$f" .js)
+  cp "$f" "public/assets/controllers/$name"
+  cp "$f" "public/assets/controllers/$name.js"
+done
+echo "=== Done: $(ls public/assets/controllers/ | wc -l) files ==="
