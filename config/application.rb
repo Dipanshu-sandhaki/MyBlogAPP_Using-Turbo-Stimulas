@@ -25,5 +25,8 @@ module TurboBlog
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    config.assets.paths << Rails.root.join("app/javascript")
+    config.assets.precompile += Dir["app/javascript/controllers/*.js"].map { |f| "controllers/#{File.basename(f)}" }
   end
 end
