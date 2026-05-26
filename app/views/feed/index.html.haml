@@ -1,5 +1,5 @@
 .min-h-screen.bg-gray-50.dark:bg-gray-900.transition-colors.duration-300
-  .max-w-6xl.mx-auto.px-4.sm:px-6.py-10.flex.gap-7
+  .max-w-6xl.mx-auto.px-4.sm:px-6.py-10.flex.flex-col.lg:flex-row.gap-7
     .flex-1.min-w-0.space-y-6
       .flex.items-center.justify-between
         %div
@@ -24,8 +24,8 @@
           - @blogs.each do |blog|
             = render partial: "blogs/feed_blog", locals: { blog: blog, current_user: current_user }
 
-    .w-72.shrink-0
-      .sticky.top-20.space-y-5
+    .w-full.lg:w-72.shrink-0
+      .lg:sticky.top-20.space-y-5
         .bg-white.dark:bg-gray-800.rounded-2xl.border.border-gray-200.dark:border-gray-700.shadow-sm.overflow-hidden
           .px-5.py-4.border-b.border-gray-200.dark:border-gray-700
             .flex.items-center.gap-2.5
