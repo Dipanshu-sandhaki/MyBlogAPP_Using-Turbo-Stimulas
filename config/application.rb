@@ -12,5 +12,6 @@ module TurboBlog
 
     config.assets.paths << Rails.root.join("app/javascript")
     config.assets.precompile += Dir["app/javascript/controllers/*.js"].map { |f| "controllers/#{File.basename(f)}" }
+    config.action_controller.forgery_protection_origin_check = false
   end
 end
