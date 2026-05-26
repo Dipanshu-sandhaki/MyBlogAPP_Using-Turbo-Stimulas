@@ -3,7 +3,7 @@
     %h2.text-2xl.font-bold.text-center.text-blue-600.dark:text-blue-400.mb-6
       Login to TurboBlog
     
-    = form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-4" }) do |f|
+    = form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-4" }, data: { turbo: false }) do |f|
       %div
         = f.label :email, class: "block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
         = f.email_field :email, autofocus: true, class: "w-full px-3 py-2 rounded-lg outline-none border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500"
