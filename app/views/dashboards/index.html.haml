@@ -18,7 +18,6 @@
           = link_to "D", dashboard_path(period: "daily"),   class: "period-btn #{@period == 'daily' ? 'active' : ''}", title: "Daily"
           = link_to "W", dashboard_path(period: "weekly"),  class: "period-btn #{@period.blank? || @period == 'weekly' ? 'active' : ''}", title: "Weekly"
           = link_to "M", dashboard_path(period: "monthly"), class: "period-btn #{@period == 'monthly' ? 'active' : ''}", title: "Monthly"
-
         .dash-user-chip
           .dash-avatar= username[0].upcase
           %span= username
@@ -28,7 +27,7 @@
       .greeting-left
         %h1.dash-title
           %span.greeting-hi Hey,
-          = " #{username} 👋"
+          %span.greeting-name= " #{username} 👋"
         %p.dash-subtitle
           Here's how your content performed
           %strong= period_label.downcase
@@ -48,15 +47,15 @@
             .kpi-icon{style: "background:rgba(59,130,246,0.12);color:#3b82f6"}
               %svg{width: "14", height: "14", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2.5"}
                 %path{"stroke-linecap": "round", "stroke-linejoin": "round", d: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"}
-            %span Published
+            %span Posts
           - if @blogs_delta
             %span{class: "kpi-badge #{@blogs_delta >= 0 ? 'up' : 'down'}"}
               = @blogs_delta >= 0 ? "↑ +#{@blogs_delta}%" : "↓ #{@blogs_delta}%"
-        .kpi-value= @total_blogs
+        .kpi-value= @period_blogs
         .kpi-footer
           .kpi-period-stat
-            %span.kpi-period-num= @period_blogs
-            %span.kpi-period-lbl= " #{period_label.downcase}"
+            %span.kpi-period-num= @total_blogs_alltime
+            %span.kpi-period-lbl all time
           .kpi-dot
           .kpi-period-stat
             %span.kpi-period-num= @total_drafts
@@ -73,11 +72,11 @@
           - if @likes_delta
             %span{class: "kpi-badge #{@likes_delta >= 0 ? 'up' : 'down'}"}
               = @likes_delta >= 0 ? "↑ +#{@likes_delta}%" : "↓ #{@likes_delta}%"
-        .kpi-value= @total_likes
+        .kpi-value= @period_likes
         .kpi-footer
           .kpi-period-stat
-            %span.kpi-period-num= @period_likes
-            %span.kpi-period-lbl= " #{period_label.downcase}"
+            %span.kpi-period-num= @total_likes_alltime
+            %span.kpi-period-lbl all time
 
       .kpi-card
         .kpi-accent-bar{style: "background:#a855f7"}
@@ -90,11 +89,11 @@
           - if @comments_delta
             %span{class: "kpi-badge #{@comments_delta >= 0 ? 'up' : 'down'}"}
               = @comments_delta >= 0 ? "↑ +#{@comments_delta}%" : "↓ #{@comments_delta}%"
-        .kpi-value= @total_comments
+        .kpi-value= @period_comments
         .kpi-footer
           .kpi-period-stat
-            %span.kpi-period-num= @period_comments
-            %span.kpi-period-lbl= " #{period_label.downcase}"
+            %span.kpi-period-num= @total_comments_alltime
+            %span.kpi-period-lbl all time
 
       .kpi-card
         .kpi-accent-bar{style: "background:#10b981"}
@@ -109,7 +108,7 @@
         .kpi-footer
           .kpi-period-stat
             %span.kpi-period-num= @period_engagement
-            %span.kpi-period-lbl interactions this period
+            %span.kpi-period-lbl interactions #{period_label.downcase}
 
     -# ── CHART + SIDEBAR ──────────────────────────────────────────────────────
     .section-grid.chart-layout
@@ -240,137 +239,115 @@
                 .net-num-compact{class: ratio.to_f >= 1 ? 'ratio-good' : 'ratio-low'}= "#{ratio}×"
                 .net-lbl-compact Ratio
 
-    -# ── TOP POSTS & RECENT FOLLOWERS (SIDE BY SIDE) ──────────────────────────
-    .two-col-independent
-      -# Panel 1: Top Posts
-      .panel.independent-panel
+    -# ── TOP POSTS — FULL WIDTH, MAX 5 ───────────────────────────────────────
+    - if @top_blogs.any?
+      .panel.top-posts-full
         .panel-header
           %div
             %h2.panel-title Top Posts
-            %p.panel-sub By total engagement
+            %p.panel-sub By total engagement · all time
           = link_to "View all →", my_blogs_path, class: "panel-link"
-        - if @top_blogs.any?
-          .blog-list
-            - rank_colors = %w[#f59e0b #94a3b8 #cd7f32 #64748b #64748b]
-            - @top_blogs.each_with_index do |blog, i|
-              - eng = blog.likes_count + blog.comments_count
-              .blog-row{"data-tppage": i < 3 ? "1" : "2"}
-                .blog-rank{style: "color:#{rank_colors[i]}"}= i + 1
-                .blog-info
-                  %p.blog-title= blog.title
-                  %p.blog-date= blog.created_at.strftime("%b %d, %Y")
-                .blog-stats
-                  .bs-item.likes
-                    %svg{width: "12", height: "12", viewBox: "0 0 24 24", fill: "currentColor"}
-                      %path{d: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"}
-                    %span= blog.likes_count
-                  .bs-item.comments
-                    %svg{width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2.5"}
-                      %path{"stroke-linecap": "round", "stroke-linejoin": "round", d: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"}
-                    %span= blog.comments_count
-                  %span{class: "eng-badge #{eng > 10 ? 'high' : eng > 3 ? 'mid' : 'low'}"}= eng
-          - if @top_blogs.count > 3
-            .panel-footer
-              %button.see-more-btn#topBlogsToggle{"data-state": "collapsed", onclick: "toggleTopBlogs()"} See more 
-        - else
-          .empty-state
-            %svg{width: "32", height: "32", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "1.5"}
-              %path{"stroke-linecap": "round", "stroke-linejoin": "round", d: "M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"}
-            %p.empty-title No published posts yet
-            %p.empty-sub Start writing to see your top performers
+        .blog-list
+          - rank_colors = %w[#f59e0b #94a3b8 #cd7f32 #64748b #64748b]
+          - @top_blogs.each_with_index do |blog, i|
+            - eng = blog.likes_count + blog.comments_count
+            .blog-row-full
+              .blog-rank{style: "color:#{rank_colors[i]}"}= i + 1
+              .blog-info
+                %p.blog-title= blog.title
+                %p.blog-date= blog.created_at.strftime("%b %d, %Y")
+              .blog-stats
+                .bs-item.likes
+                  %svg{width: "12", height: "12", viewBox: "0 0 24 24", fill: "currentColor"}
+                    %path{d: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"}
+                  %span= blog.likes_count
+                .bs-item.comments
+                  %svg{width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2.5"}
+                    %path{"stroke-linecap": "round", "stroke-linejoin": "round", d: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"}
+                  %span= blog.comments_count
+                %span{class: "eng-badge #{eng > 10 ? 'high' : eng > 3 ? 'mid' : 'low'}"}= eng
 
-      -# Panel 2: Recent Followers
-      - if @recent_followers.any?
-        .panel.independent-panel
-          .panel-header
-            %div
-              %h2.panel-title Recent Followers
-              %p.panel-sub People who followed you
-            %span.count-pill= "#{@total_followers} total"
-          .followers-compact-grid
-            - colors = %w[#3b82f6 #a855f7 #ef4444 #10b981 #f59e0b #06b6d4]
-            - @recent_followers.each do |follower|
-              - color = colors[follower.id % colors.length]
-              .follower-compact
-                .follower-av-sm{style: "background:#{color}1a;color:#{color}"}= follower.email[0].upcase
-                .follower-compact-info
-                  %p.follower-name-sm= follower.email.split('@').first
-                  %p.follower-time-sm= time_ago_in_words(follower.created_at) + " ago"
-
-    -# ── ACTIVITY (FULL VIEW) ─────────────────────────────────────────────────
+    -# ── ACTIVITY: last 24 hours ──────────────────────────────────────────────
     .panel.activity-full-panel
       .panel-header
         %div
           %h2.panel-title Activity
-          %p.panel-sub Latest interactions
+          %p.panel-sub Last 24 hours · all interactions
       - if @recent_activity.any?
         .activity-list
           - @recent_activity.each_with_index do |event, idx|
-            - u = event[:user]
-            - init = u ? u.email[0].upcase : "?"
-            - is_like = event[:type] == 'like'
-            .activity-row{"data-actpage": idx < 5 ? "1" : "2"}
-              .activity-avatar{class: is_like ? 'like-av' : 'comment-av'}= init
+            - u      = event[:user]
+            - init   = u ? u.email[0].upcase : "?"
+            - etype  = event[:type]
+            - av_cls = case etype
+              - when 'like_received'    then 'like-av'
+              - when 'comment_received' then 'comment-av'
+              - when 'new_follower'     then 'follow-av'
+              - when 'i_followed'       then 'ifollowed-av'
+              - when 'published'        then 'published-av'
+              - when 'i_commented'      then 'icomment-av'
+              - else 'comment-av'
+            - ic_cls = case etype
+              - when 'like_received'    then 'icon-like'
+              - when 'comment_received' then 'icon-comment'
+              - when 'new_follower'     then 'icon-follow'
+              - when 'i_followed'       then 'icon-ifollow'
+              - when 'published'        then 'icon-publish'
+              - when 'i_commented'      then 'icon-icomment'
+              - else 'icon-comment'
+            .activity-row{"data-actpage": idx < 6 ? "1" : "2"}
+              .activity-avatar{class: av_cls}= init
               .activity-info
                 .activity-line
                   %span.activity-who= u ? u.email.split('@').first : "Someone"
-                  %span.activity-verb= is_like ? "liked" : "commented on"
-                  %span.activity-post= event[:blog]&.title.to_s.truncate(20)
-                - if !is_like && event[:body].present?
+                  - case etype
+                  - when 'like_received'
+                    %span.activity-verb liked your post
+                    %span.activity-post= event[:blog]&.title.to_s.truncate(30)
+                  - when 'comment_received'
+                    %span.activity-verb commented on
+                    %span.activity-post= event[:blog]&.title.to_s.truncate(30)
+                  - when 'new_follower'
+                    %span.activity-verb started following you
+                  - when 'i_followed'
+                    %span.activity-verb= "you followed"
+                    %span.activity-post= u ? u.email.split('@').first : ""
+                  - when 'published'
+                    %span.activity-verb published
+                    %span.activity-post= event[:blog]&.title.to_s.truncate(30)
+                  - when 'i_commented'
+                    %span.activity-verb you commented on
+                    %span.activity-post= event[:blog]&.title.to_s.truncate(30)
+                - if ['comment_received', 'i_commented'].include?(etype) && event[:body].present?
                   %p.activity-body= "\"#{event[:body]}\""
                 %p.activity-time= time_ago_in_words(event[:at]) + " ago"
-              %span.activity-icon{class: is_like ? 'icon-like' : 'icon-comment'}
-                - if is_like
+              %span.activity-icon{class: ic_cls}
+                - case etype
+                - when 'like_received'
                   %svg{width: "12", height: "12", viewBox: "0 0 24 24", fill: "currentColor"}
                     %path{d: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"}
-                - else
+                - when 'comment_received', 'i_commented'
                   %svg{width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2.5"}
                     %path{"stroke-linecap": "round", "stroke-linejoin": "round", d: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"}
-        - if @recent_activity.count > 5
+                - when 'new_follower', 'i_followed'
+                  %svg{width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2.5"}
+                    %path{"stroke-linecap": "round", "stroke-linejoin": "round", d: "M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"}
+                - when 'published'
+                  %svg{width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2.5"}
+                    %path{"stroke-linecap": "round", "stroke-linejoin": "round", d: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"}
+        - if @recent_activity.count > 6
           .panel-footer
-            %button.see-more-btn#activityToggle{"data-state": "collapsed", onclick: "toggleActivity()"} See more 
+            %button.see-more-btn#activityToggle{"data-state": "collapsed", onclick: "toggleActivity()"} See more
       - else
         .empty-state
           %svg{width: "32", height: "32", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "1.5"}
             %path{"stroke-linecap": "round", "stroke-linejoin": "round", d: "M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"}
-          %p.empty-title No activity yet
-          %p.empty-sub Get likes & comments to see them here
-
-    -# ── ALL POSTS PERFORMANCE TABLE ──────────────────────────────────────────
-    - if @top_blogs.any?
-      .panel.table-panel
-        .panel-header
-          %div
-            %h2.panel-title All Posts Performance
-            %p.panel-sub Complete breakdown of every published post
-        .table-wrap
-          %table.perf-table
-            %thead
-              %tr
-                %th Title
-                %th Published
-                %th.tc Likes
-                %th.tc Comments
-                %th.tc Engagement
-            %tbody
-              - @top_blogs.each do |blog|
-                - total = blog.likes_count + blog.comments_count
-                %tr
-                  %td
-                    %span.cell-title= blog.title
-                  %td
-                    %span.cell-date= blog.created_at.strftime("%b %d, %Y")
-                  %td.tc
-                    %span.cell-likes= blog.likes_count
-                  %td.tc
-                    %span.cell-comments= blog.comments_count
-                  %td.tc
-                    %span{class: "eng-badge #{total > 10 ? 'high' : total > 3 ? 'mid' : 'low'}"}= total
+          %p.empty-title No activity in the last 24 hours
+          %p.empty-sub Likes, comments, follows & posts will appear here
 
 %script
   :plain
     document.addEventListener('DOMContentLoaded', function () {
-      // ── TOOLTIP ────────────────────────────────────────────────────────────
       const tooltip = document.getElementById('chartTooltip');
       const svgEl   = document.getElementById('engagementChart');
 
@@ -388,44 +365,22 @@
             tooltip.style.left    = (dotRect.left - svgRect.left + dotRect.width / 2 - 65) + 'px';
             tooltip.style.top     = (dotRect.top  - svgRect.top - 115) + 'px';
           });
-          dot.addEventListener('mouseleave', function () {
-            tooltip.style.display = 'none';
-          });
+          dot.addEventListener('mouseleave', function () { tooltip.style.display = 'none'; });
         });
       }
 
-      // ── TOP POSTS TOGGLE ───────────────────────────────────────────────────
-      window.toggleTopBlogs = function () {
-        var btn   = document.getElementById('topBlogsToggle');
-        var rows  = document.querySelectorAll('.blog-row[data-tppage="2"]');
-        if (btn.dataset.state === 'collapsed') {
-          rows.forEach(function(r) { r.style.display = 'flex'; });
-          btn.textContent  = 'See less';
-          btn.dataset.state = 'expanded';
-        } else {
-          rows.forEach(function(r) { r.style.display = 'none'; });
-          btn.textContent  = 'See more';
-          btn.dataset.state = 'collapsed';
-        }
-      };
-
-      // ── ACTIVITY TOGGLE ────────────────────────────────────────────────────
       window.toggleActivity = function () {
-        var btn   = document.getElementById('activityToggle');
-        var rows  = document.querySelectorAll('.activity-row[data-actpage="2"]');
+        var btn  = document.getElementById('activityToggle');
+        var rows = document.querySelectorAll('.activity-row[data-actpage="2"]');
         if (btn.dataset.state === 'collapsed') {
           rows.forEach(function(r) { r.style.display = 'flex'; });
-          btn.textContent  = 'See less';
-          btn.dataset.state = 'expanded';
+          btn.textContent = 'See less'; btn.dataset.state = 'expanded';
         } else {
           rows.forEach(function(r) { r.style.display = 'none'; });
-          btn.textContent  = 'See more';
-          btn.dataset.state = 'collapsed';
+          btn.textContent = 'See more'; btn.dataset.state = 'collapsed';
         }
       };
 
-      // Hide page-2 rows by default
-      document.querySelectorAll('.blog-row[data-tppage="2"]').forEach(function(r) { r.style.display = 'none'; });
       document.querySelectorAll('.activity-row[data-actpage="2"]').forEach(function(r) { r.style.display = 'none'; });
     });
 
@@ -466,127 +421,51 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .dash-root {
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--text-1);
-      font-family: var(--font);
-    }
+    .dash-root { min-height: 100vh; background: var(--bg); color: var(--text-1); font-family: var(--font); }
 
-    /* ── SUB-NAV ──────────────────────────────────────────────────────────── */
-    .dash-subnav {
-      background: var(--bg-panel);
-      border-bottom: 1px solid var(--border);
-    }
-    .dash-nav-inner {
-      max-width: 1200px; margin: 0 auto;
-      padding: 0 24px;
-      height: 52px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
+    .dash-subnav { background: var(--bg-panel); border-bottom: 1px solid var(--border); }
+    .dash-nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
     .dash-nav-left { display: flex; align-items: center; gap: 10px; }
-    .dash-logo {
-      display: flex; align-items: center; gap: 7px;
-      font-size: 14px; font-weight: 900; letter-spacing: -.4px;
-      color: var(--text-1);
-    }
+    .dash-logo { display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 900; letter-spacing: -.4px; color: var(--text-1); }
     .dash-logo svg { color: var(--blue); }
-    .dash-period-pill {
-      font-size: 11px; font-weight: 700;
-      color: var(--blue);
-      background: rgba(59,130,246,0.10);
-      border: 1px solid rgba(59,130,246,0.20);
-      padding: 3px 10px; border-radius: 20px;
-    }
+    .dash-period-pill { font-size: 11px; font-weight: 700; color: var(--blue); background: rgba(59,130,246,0.10); border: 1px solid rgba(59,130,246,0.20); padding: 3px 10px; border-radius: 20px; }
     .dash-nav-right { display: flex; align-items: center; gap: 10px; }
-    .dash-period-switcher {
-      display: flex; gap: 2px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 3px;
-    }
-    .period-btn {
-      padding: 4px 13px;
-      font-size: 12px; font-weight: 800;
-      border-radius: 6px;
-      color: var(--text-3);
-      text-decoration: none;
-      transition: all .15s;
-    }
+    .dash-period-switcher { display: flex; gap: 2px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 3px; }
+    .period-btn { padding: 4px 13px; font-size: 12px; font-weight: 800; border-radius: 6px; color: var(--text-3); text-decoration: none; transition: all .15s; }
     .period-btn:hover { color: var(--text-1); background: var(--border); }
     .period-btn.active { background: var(--blue); color: #fff; box-shadow: 0 2px 6px rgba(59,130,246,.35); }
-    .dash-user-chip {
-      display: flex; align-items: center; gap: 6px;
-      padding: 4px 10px 4px 4px;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      font-size: 12px; font-weight: 700; color: var(--text-2);
-    }
-    .dash-avatar {
-      width: 26px; height: 26px; border-radius: 50%;
-      background: var(--blue); color: #fff;
-      font-size: 11px; font-weight: 900;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .dash-user-chip { display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border: 1px solid var(--border); border-radius: 20px; font-size: 12px; font-weight: 700; color: var(--text-2); }
+    .dash-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 11px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
 
-    /* ── BODY ─────────────────────────────────────────────────────────────── */
     .dash-body { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; }
 
-    /* ── GREETING ──────────────────────────────────────────────────────────── */
-    .dash-greeting {
-      margin-bottom: 24px;
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 12px;
-    }
-    .dash-title { font-size: 26px; font-weight: 900; letter-spacing: -.6px; line-height: 1.1; color: var(--text-1); }
-    .greeting-hi { color: var(--text-4); }
+    /* ── GREETING — name always high-contrast ── */
+    .dash-greeting { margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .dash-title { font-size: 26px; font-weight: 900; letter-spacing: -.6px; line-height: 1.1; }
+    .greeting-hi {color: #0d1b2e; }
+    html.dark .greeting-hi { color: #ffffff; }
+    .greeting-name { color: #0d1b2e; }
+    html.dark .greeting-name { color: #ffffff; }
     .dash-subtitle { margin-top: 4px; font-size: 13px; color: var(--text-3); }
     .dash-subtitle strong { color: var(--text-2); }
-    .live-date-badge {
-      display: flex; align-items: center; gap: 7px;
-      background: var(--bg-panel); border: 1px solid var(--border);
-      border-radius: 10px; padding: 7px 13px;
-      font-size: 12px; font-weight: 700; color: var(--text-2);
-      box-shadow: var(--shadow-sm);
-    }
+    .live-date-badge { display: flex; align-items: center; gap: 7px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 7px 13px; font-size: 12px; font-weight: 700; color: var(--text-2); box-shadow: var(--shadow-sm); }
     .live-date-badge svg { color: var(--blue); flex-shrink: 0; }
 
-    /* ── PANEL ─────────────────────────────────────────────────────────────── */
-    .panel {
-      background: var(--bg-panel); border: 1px solid var(--border);
-      border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden;
-    }
-    .panel-header {
-      display: flex; align-items: flex-start; justify-content: space-between;
-      padding: 18px 20px 14px; border-bottom: 1px solid var(--border-soft);
-    }
+    .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+    .panel-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 18px 20px 14px; border-bottom: 1px solid var(--border-soft); }
     .compact-header { padding: 13px 16px 9px; }
     .panel-title { font-size: 13px; font-weight: 900; color: var(--text-1); letter-spacing: -.2px; }
     .panel-sub   { font-size: 11px; color: var(--text-3); margin-top: 2px; font-weight: 500; }
     .panel-link  { font-size: 11px; font-weight: 800; color: var(--blue); text-decoration: none; white-space: nowrap; }
     .panel-link:hover { text-decoration: underline; }
     .panel-footer { padding: 11px 20px; border-top: 1px solid var(--border-soft); display: flex; justify-content: center; }
-    .see-more-btn {
-      background: none; border: 1.5px solid var(--border); border-radius: 8px;
-      padding: 6px 20px; font-size: 12px; font-weight: 800; color: var(--text-2);
-      cursor: pointer; transition: all .15s;
-    }
+    .see-more-btn { background: none; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 20px; font-size: 12px; font-weight: 800; color: var(--text-2); cursor: pointer; transition: all .15s; }
     .see-more-btn:hover { border-color: var(--blue); color: var(--blue); background: rgba(59,130,246,0.05); }
 
-    /* ── KPI GRID ──────────────────────────────────────────────────────────── */
-    .kpi-grid {
-      display: grid; grid-template-columns: repeat(4,1fr);
-      gap: 14px; margin-bottom: 20px;
-    }
+    .kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
     @media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
     @media(max-width:480px){.kpi-grid{grid-template-columns:1fr;}}
-
-    .kpi-card {
-      background: var(--bg-panel); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 18px 20px 16px;
-      box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
-    }
+    .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px 16px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
     .kpi-accent-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
     .kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
     .kpi-label { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 800; color: var(--text-2); text-transform: uppercase; letter-spacing: .07em; }
@@ -604,24 +483,10 @@
     .kpi-period-lbl  { font-weight: 500; color: var(--text-4); font-size: 11px; }
     .kpi-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
 
-    /* ── LAYOUT ────────────────────────────────────────────────────────────── */
     .section-grid { display: grid; gap: 16px; margin-bottom: 18px; }
     .chart-layout { grid-template-columns: 1fr 288px; }
     @media(max-width:960px){ .chart-layout { grid-template-columns: 1fr; } }
 
-    /* ── INDEPENDENT TWO-COL ────────────────────────────────────────────────── */
-    .two-col-independent {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 18px;
-      align-items: start;
-    }
-    @media(max-width:960px){ .two-col-independent { grid-template-columns: 1fr; } }
-    .independent-panel { width: 100%; }
-    .activity-full-panel { margin-bottom: 18px; }
-
-    /* ── CHART ─────────────────────────────────────────────────────────────── */
     .chart-wrapper { position: relative; padding: 8px 14px 4px; }
     .chart-svg  { width: 100%; display: block; overflow: visible; }
     .chart-grid { stroke: var(--border); stroke-width: 1; }
@@ -633,13 +498,7 @@
     .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-2); font-weight: 700; }
     .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-    /* Tooltip */
-    .chart-tooltip {
-      display: none; position: absolute; pointer-events: none; z-index: 20;
-      background: var(--bg-panel); border: 1.5px solid var(--border);
-      border-radius: 10px; padding: 10px 13px;
-      box-shadow: var(--shadow-md); min-width: 130px;
-    }
+    .chart-tooltip { display: none; position: absolute; pointer-events: none; z-index: 20; background: var(--bg-panel); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 13px; box-shadow: var(--shadow-md); min-width: 130px; }
     .tt-date { font-size: 11px; font-weight: 900; color: var(--text-1); margin-bottom: 7px; text-transform: uppercase; letter-spacing:.05em; }
     .tt-row  { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; font-size: 12px; }
     .tt-row:last-child { margin-bottom: 0; }
@@ -647,14 +506,9 @@
     .tt-key  { flex: 1; color: var(--text-3); font-weight: 600; }
     .tt-val  { font-weight: 900; color: var(--text-1); }
 
-    .empty-chart {
-      height: 240px; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 10px;
-      margin: 12px 14px; border-radius: 10px; border: 2px dashed var(--border);
-    }
+    .empty-chart { height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; margin: 12px 14px; border-radius: 10px; border: 2px dashed var(--border); }
     .empty-chart svg { color: var(--text-4); }
 
-    /* ── SIDEBAR ────────────────────────────────────────────────────────────── */
     .sidebar-stack { display: flex; flex-direction: column; gap: 12px; }
     .best-post-panel { padding: 16px 18px; }
     .best-post-crown { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; color: var(--amber); margin-bottom: 10px; }
@@ -682,19 +536,18 @@
     .net-num-compact.ratio-low  { color: var(--amber); }
     .net-lbl-compact { font-size: 11px; font-weight: 700; color: var(--text-3); margin-top: 1px; }
 
-    /* ── BLOG LIST ──────────────────────────────────────────────────────────── */
-    .blog-row { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--border-soft); transition: background .12s; }
-    .blog-row:last-child { border-bottom: none; }
-    .blog-row:hover { background: var(--bg-hover); }
-    .blog-rank  { font-size: 12px; font-weight: 900; width: 20px; text-align: center; flex-shrink: 0; }
+    .top-posts-full { margin-bottom: 18px; }
+    .blog-row-full { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--border-soft); transition: background .12s; }
+    .blog-row-full:last-child { border-bottom: none; }
+    .blog-row-full:hover { background: var(--bg-hover); }
+    .blog-rank  { font-size: 13px; font-weight: 900; width: 22px; text-align: center; flex-shrink: 0; }
     .blog-info  { flex: 1; min-width: 0; }
-    .blog-title { font-size: 13px; font-weight: 800; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .blog-date  { font-size: 11px; color: var(--text-3); margin-top: 2px; }
-    .blog-stats { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-    .bs-item    { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--text-2); }
+    .blog-title { font-size: 14px; font-weight: 800; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .blog-date  { font-size: 11px; color: var(--text-3); margin-top: 3px; }
+    .blog-stats { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .bs-item    { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 800; color: var(--text-2); }
     .bs-item.likes    svg { color: var(--red); }
     .bs-item.comments svg { color: var(--purple); }
-
     .eng-badge { font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 20px; }
     .eng-badge.high { background: #dcfce7; color: #15803d; }
     .eng-badge.mid  { background: #dbeafe; color: #1e40af; }
@@ -702,52 +555,32 @@
     .dark .eng-badge.high { background: rgba(16,185,129,.18); color: #4ade80; }
     .dark .eng-badge.mid  { background: rgba(59,130,246,.18); color: #60a5fa; }
 
-    /* ── ACTIVITY LIST ──────────────────────────────────────────────────────── */
+    .activity-full-panel { margin-bottom: 18px; }
     .activity-row { display: flex; align-items: flex-start; gap: 11px; padding: 12px 20px; border-bottom: 1px solid var(--border-soft); transition: background .12s; }
     .activity-row:last-child { border-bottom: none; }
     .activity-row:hover { background: var(--bg-hover); }
     .activity-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; flex-shrink: 0; }
-    .like-av    { background: rgba(239,68,68,.12);  color: var(--red); }
-    .comment-av { background: rgba(168,85,247,.12); color: var(--purple); }
+    .like-av       { background: rgba(239,68,68,.12);  color: var(--red); }
+    .comment-av    { background: rgba(168,85,247,.12); color: var(--purple); }
+    .follow-av     { background: rgba(59,130,246,.12); color: var(--blue); }
+    .ifollowed-av  { background: rgba(6,182,212,.12);  color: #06b6d4; }
+    .published-av  { background: rgba(16,185,129,.12); color: var(--green); }
+    .icomment-av   { background: rgba(245,158,11,.12); color: var(--amber); }
     .activity-info { flex: 1; min-width: 0; }
     .activity-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px; }
     .activity-who  { font-size: 12px; font-weight: 900; color: var(--text-1); }
     .activity-verb { font-size: 12px; color: var(--text-3); font-weight: 500; }
-    .activity-post { font-size: 12px; font-weight: 800; color: var(--blue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+    .activity-post { font-size: 12px; font-weight: 800; color: var(--blue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
     .activity-body { font-size: 11px; color: var(--text-3); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; }
     .activity-time { font-size: 11px; color: var(--text-4); margin-top: 3px; font-weight: 600; }
     .activity-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
-    .icon-like    { background: rgba(239,68,68,.12);  color: var(--red); }
-    .icon-comment { background: rgba(168,85,247,.12); color: var(--purple); }
+    .icon-like     { background: rgba(239,68,68,.12);  color: var(--red); }
+    .icon-comment  { background: rgba(168,85,247,.12); color: var(--purple); }
+    .icon-follow   { background: rgba(59,130,246,.12); color: var(--blue); }
+    .icon-ifollow  { background: rgba(6,182,212,.12);  color: #06b6d4; }
+    .icon-publish  { background: rgba(16,185,129,.12); color: var(--green); }
+    .icon-icomment { background: rgba(245,158,11,.12); color: var(--amber); }
 
-    /* ── FOLLOWERS ──────────────────────────────────────────────────────────── */
-    .followers-compact-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); padding: 6px 0; }
-    .follower-compact { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border-soft); border-right: 1px solid var(--border-soft); transition: background .12s; }
-    .follower-compact:hover { background: var(--bg-hover); }
-    .follower-av-sm { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; }
-    .follower-compact-info { min-width: 0; }
-    .follower-name-sm { font-size: 12px; font-weight: 800; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .follower-time-sm { font-size: 10px; color: var(--text-4); font-weight: 600; margin-top: 1px; }
-    .count-pill { font-size: 10px; font-weight: 900; background: rgba(6,182,212,.12); color: #06b6d4; padding: 3px 10px; border-radius: 20px; }
-
-    /* ── ALL POSTS TABLE ────────────────────────────────────────────────────── */
-    .table-panel { margin-bottom: 18px; }
-    .table-wrap { overflow-x: auto; }
-    .perf-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .perf-table thead tr { border-bottom: 1px solid var(--border); }
-    .perf-table th { padding: 10px 20px; text-align: left; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--text-3); }
-    .perf-table th.tc { text-align: center; }
-    .perf-table tbody tr { border-bottom: 1px solid var(--border-soft); transition: background .12s; }
-    .perf-table tbody tr:last-child { border-bottom: none; }
-    .perf-table tbody tr:hover { background: var(--bg-hover); }
-    .perf-table td { padding: 12px 20px; vertical-align: middle; }
-    .perf-table td.tc { text-align: center; }
-    .cell-title    { font-weight: 700; color: var(--text-1); display: block; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .cell-date     { font-size: 12px; color: var(--text-3); }
-    .cell-likes    { font-weight: 900; color: var(--red); }
-    .cell-comments { font-weight: 900; color: var(--purple); }
-
-    /* ── EMPTY STATES ───────────────────────────────────────────────────────── */
     .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 24px; gap: 10px; }
     .empty-state svg { color: var(--text-4); }
     .empty-title { font-size: 13px; font-weight: 800; color: var(--text-3); }

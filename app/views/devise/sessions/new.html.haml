@@ -2,23 +2,44 @@
   .w-full.max-w-md.bg-white.dark:bg-gray-800.rounded-xl.shadow-lg.border.border-gray-200.dark:border-gray-700.p-6
     %h2.text-2xl.font-bold.text-center.text-blue-600.dark:text-blue-400.mb-6
       Login to TurboBlog
-    
+
     = form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-4" }, data: { turbo: false }) do |f|
       %div
         = f.label :email, class: "block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-        = f.email_field :email, autofocus: true, class: "w-full px-3 py-2 rounded-lg outline-none border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500"
-      
+        = f.email_field :email, autofocus: true,
+            placeholder: "you@example.com",
+            class: "w-full px-3 py-2 rounded-lg outline-none border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500"
+
       %div
         = f.label :password, class: "block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-        = f.password_field :password, class: "w-full px-3 py-2 rounded-lg outline-none border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-      
+        .relative
+          = f.password_field :password, id: "session_password",
+              placeholder: "Enter your password",
+              class: "w-full px-3 py-2 pr-10 rounded-lg outline-none border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+          %button.absolute.inset-y-0.right-0.flex.items-center.px-3.text-gray-400.hover:text-gray-600.dark:hover:text-gray-200.transition{type: "button", onclick: "togglePassword('session_password', this)", tabindex: "-1", "aria-label" => "Toggle password visibility"}
+            %svg.w-5.h-5{"data-eye" => "show", fill: "none", stroke: "currentColor", "stroke-width" => "2", viewbox: "0 0 24 24"}
+              %path{d: "M15 12a3 3 0 11-6 0 3 3 0 016 0z", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+              %path{d: "M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+            %svg.w-5.h-5.hidden{"data-eye" => "hide", fill: "none", stroke: "currentColor", "stroke-width" => "2", viewbox: "0 0 24 24"}
+              %path{d: "M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+
       .flex.items-center
         = f.check_box :remember_me, class: "mr-2 accent-blue-600"
         = f.label :remember_me, class: "text-sm text-gray-600 dark:text-gray-400"
-      
+
       = f.submit "Log in", class: "w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition cursor-pointer"
-    
+
     .mt-4.text-center.text-sm.text-gray-600.dark:text-gray-400
       = link_to "Sign up", new_registration_path(resource_name), class: "text-blue-600 dark:text-blue-400 hover:underline"
       %span.mx-1 |
       = link_to "Forgot password?", new_password_path(resource_name), class: "text-blue-600 dark:text-blue-400 hover:underline"
+
+:javascript
+  function togglePassword(fieldId, btn) {
+    const input = document.getElementById(fieldId);
+    if (!input) return;
+    const isHidden = input.type === "password";
+    input.type = isHidden ? "text" : "password";
+    btn.querySelector('[data-eye="show"]').classList.toggle("hidden", isHidden);
+    btn.querySelector('[data-eye="hide"]').classList.toggle("hidden", !isHidden);
+  }
